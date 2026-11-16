@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QuickGrab MV3</title>
+  <style>
+    body {
+      width: 340px;
+      margin: 0;
+      padding: 16px;
+      font-family: Inter, -apple-system, sans-serif;
+      background: #0b0f19;
+      color: #f1f5f9;
+    }
+    h2 {
+      font-size: 1rem;
+      margin: 0 0 4px;
+      color: #fff;
+    }
+    p {
+      font-size: 0.76rem;
+      color: #94a3b8;
+      margin: 0 0 12px;
+    }
+    .btn {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      border: 1px solid #23304d;
+      border-radius: 8px;
+      background: #131b2e;
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      text-align: left;
+    }
+    .btn:hover {
+      border-color: #3b82f6;
+      background: #1e293b;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      border: none;
+    }
+    .status {
+      font-size: 0.75rem;
+      color: #34d399;
+      margin-top: 6px;
+      min-height: 18px;
+    }
+    .promo {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      font-size: 0.75rem;
+    }
+    .promo a {
+      color: #fbbf24;
+      font-weight: 700;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>⚡ Creator &amp; Seller QuickGrab</h2>
+  <p>1-Click DOM Actions (Tasks ChatGPT Cannot Do Inside Your Tab)</p>
+
+  <button class="btn btn-primary" id="btn-export-images">📸 Export All High-Res Page Images (.CSV)</button>
+  <button class="btn" id="btn-export-tables">📊 Export All Page Tables &amp; Specs (.CSV)</button>
+  <button class="btn" id="btn-toggle-safezone">📱 Toggle 9:16 Safe-Zone Overlay on Video</button>
+  <button class="btn" id="btn-audit-headings">🔍 Copy Page SEO Titles, Meta &amp; H1-H3</button>
+
+  <div class="status" id="status-msg">Ready on active tab.</div>
+
+  <div class="promo">
+    🔥 Need 60fps Hooks &amp; Captions for Premiere/DaVinci?<br/>
+    <a href="https://gumroad.com/" target="_blank">Get ViralRetentionPack V1 ($29) →</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

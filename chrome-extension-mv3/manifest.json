@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Creator & Seller QuickGrab MV3 — 1-Click DOM Exporter & Safe-Zone Overlay",
+  "version": "1.0.0",
+  "description": "1-Click Marketplace Image/Spec CSV Exporter, YouTube Mobile Title & Safe-Zone Overlay Injector, and Quick DevEx/RPM Calculator.",
+  "permissions": ["activeTab", "scripting", "clipboardWrite"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Creator & Seller QuickGrab MV3"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

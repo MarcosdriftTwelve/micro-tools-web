@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://marcosdrifttwelve.github.io/micro-tools-web/sitemap.xml
