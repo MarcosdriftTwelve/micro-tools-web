@@ -523,3 +523,147 @@ canvas {
     margin: 0;
   }
 }
+
+/* Tool 5: Next-Gen Hardware & Affiliate Upgrade Cards */
+.lang-toggle {
+  display: inline-flex;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.lang-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 5px 10px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lang-btn.active {
+  background: var(--accent-blue);
+  color: #fff;
+}
+
+.score-bar-track {
+  width: 100%;
+  height: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 10px 0 14px;
+}
+
+.score-bar-fill {
+  height: 100%;
+  width: 65%;
+  background: linear-gradient(90deg, var(--accent-amber), var(--accent-emerald));
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.bottleneck-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0 18px;
+}
+
+.bottleneck-item {
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  color: #fecdd3;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: 0.84rem;
+}
+
+.bottleneck-item.ok {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.38);
+  color: #a7f3d0;
+}
+
+.bottleneck-item.warn {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.38);
+  color: #fde68a;
+}
+
+.affiliate-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.affiliate-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.affiliate-card.priority {
+  border-color: rgba(245, 158, 11, 0.6);
+  background: linear-gradient(160deg, rgba(245, 158, 11, 0.08), var(--bg-input));
+}
+
+.affiliate-card h4 {
+  font-size: 0.92rem;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.affiliate-card p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.affiliate-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-amz, .btn-ml {
+  flex: 1;
+  text-align: center;
+  text-decoration: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.btn-amz {
+  background: #f59e0b;
+  color: #111827;
+}
+
+.btn-ml {
+  background: #facc15;
+  color: #1e293b;
+}
+
+.vice-banner {
+  margin-top: 22px;
+  background: linear-gradient(135deg, #3b0764 0%, #0f172a 55%, #831843 100%);
+  border: 1px solid rgba(244, 63, 94, 0.5);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}

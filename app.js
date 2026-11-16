@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initYouTubeCalculatorAndPreviewer();
   initThermalLabelCropper();
   initCutListAndQuoteGenerator();
+  initNextGenChecker();
 });
 
 // ----------------------------------------------------------------------------
@@ -35,6 +36,10 @@ function initTabNavigation() {
     'panel-cutlist': {
       title: '4x8 Plywood Cut-List Visual Nesting & Instant Client Quote PDF Generator',
       desc: 'Optimize 96"×48" sheet layouts with blade kerf compensation and print a clean Client Estimate PDF or multi-page Poster Tile Grid in 1 click.'
+    },
+    'panel-nextgen': {
+      title: 'GTA 6 / Vice City Next-Gen Hardware, PS5 SSD & 120Hz TV Checker (2026)',
+      desc: 'Check your PS5, Xbox Series, or PC readiness score (0–100%), detect SSD/VRAM/HDMI 2.1 bottlenecks, and get matched upgrade picks.'
     }
   };
 
@@ -805,4 +810,327 @@ function initCutListAndQuoteGenerator() {
   });
 
   calculateAndRenderCutList();
+}
+
+// ----------------------------------------------------------------------------
+// TOOL 5: GTA 6 / NEXT-GEN HARDWARE, PS5 SSD & 120HZ TV CHECKER (EN / PT-BR)
+// ----------------------------------------------------------------------------
+function initNextGenChecker() {
+  const platformEl = document.getElementById('ng-platform');
+  const pcFieldsEl = document.getElementById('ng-pc-fields');
+  const vramEl = document.getElementById('ng-pc-vram');
+  const ramEl = document.getElementById('ng-pc-ram');
+  const pcSsdEl = document.getElementById('ng-pc-ssd');
+  const displayEl = document.getElementById('ng-display');
+  const storageEl = document.getElementById('ng-storage');
+  const langBtns = document.querySelectorAll('.lang-btn');
+
+  let lang = 'en';
+
+  const i18n = {
+    en: {
+      titleLeft: '🌴 GTA 6 / Vice City Next-Gen Hardware Checker',
+      subLeft: 'Independent 2026 readiness estimator for open-world next-gen titles (+150 GB NVMe, Ray Tracing & HDMI 2.1 120Hz VRR).',
+      lblPlatform: 'Your Current Gaming Platform',
+      lblVram: 'GPU VRAM',
+      lblRam: 'System RAM',
+      lblPcSsd: 'Storage Drive Type',
+      lblDisplay: 'Display / TV Type',
+      lblStorage: 'Free SSD Storage Space (GB)',
+      storageHint: 'Recommended: 200+ GB free on Gen4 NVMe (>= 5,500 MB/s) for base install + Day-1 patches.',
+      lblScore: 'Readiness Score',
+      lblTarget: 'Estimated Target Mode',
+      titleRight: '🔍 Bottleneck Diagnosis & Recommended Upgrades',
+      subRight: 'Exact hardware gaps detected for your setup and highest-ROI upgrade picks.',
+      upgradeHeading: '🛒 Best-Value Verified Upgrades for Your Setup',
+      viceTag: '🌴 New Release — $29 USD',
+      viceTitle: 'ViceHeist_CreatorPack_V1 — "6 Stars Wanted" HUD, Wasted/Busted Freeze & Satellite Switch',
+      viceDesc: 'Made for Gaming YouTubers, Streamers & Clippers covering Vice Miami & Leonida news. 1-click .drfx (DaVinci Resolve) + .jsx (After Effects) + OBS Overlays.',
+      viceCta: '⚡ Get ViceHeist Pack ($29) →',
+      freeSuffix: 'GB Free',
+      amzBtn: 'Amazon Deal →',
+      mlBtn: 'Mercado Livre →',
+      verdictGreat: 'Next-Gen Ready (Zero Major Bottlenecks)',
+      verdictGood: 'Playable, Minor Upgrade Recommended',
+      verdictWarn: 'Critical Bottleneck Detected',
+      msgStorageCrit: '🚨 Storage Bottleneck: Only {gb} GB free. Open-world next-gen installs + Day-1 patches require 160–200 GB.',
+      msgStorageOk: '✅ Storage OK: {gb} GB free handles base install and updates.',
+      msgTv60: '⚠️ Display Bottleneck: 60Hz TV without HDMI 2.1 locks out 40fps Balanced VRR and 120Hz low-latency modes.',
+      msgTvOk: '✅ Display OK: HDMI 2.1 / High-Refresh VRR unlocks 40fps Fidelity & smooth frame pacing.',
+      msgSeriesS: '⚠️ Console Limit: Xbox Series S targets 1080p–1440p upscaled (30fps) with tighter texture streaming & limited 512GB space.',
+      msgPs5Pro: '✅ PS5 Pro Advantage: PSSR AI upscaling + 2TB internal SSD ready for 60fps RT modes.',
+      msgPcVramCrit: '🚨 GPU VRAM Bottleneck ({vram}GB): Ray-traced dense cities require 12GB+ VRAM to avoid stutters at 1440p/4K.',
+      msgPcRamCrit: '⚠️ RAM Bottleneck (8GB): Upgrade to 16GB–32GB DDR4/DDR5 to prevent open-world pop-in.',
+      msgPcHddCrit: '🚨 Drive Speed Bottleneck: Mechanical HDD / SATA cannot stream dense next-gen textures (DirectStorage requires NVMe Gen4).'
+    },
+    pt: {
+      titleLeft: '🌴 Calculadora "Roda GTA 6?" — Hardware, SSD PS5 & TV 120Hz',
+      subLeft: 'Estimador independente 2026 para mundos abertos Next-Gen (+150 GB em NVMe Gen4, Ray Tracing e TV HDMI 2.1 120Hz VRR).',
+      lblPlatform: 'Sua Plataforma Atual',
+      lblVram: 'VRAM da Placa de Vídeo',
+      lblRam: 'Memória RAM',
+      lblPcSsd: 'Tipo de Armazenamento',
+      lblDisplay: 'Tipo de TV / Monitor',
+      lblStorage: 'Espaço Livre no SSD (GB)',
+      storageHint: 'Recomendado: 200+ GB livres em NVMe Gen4 (>= 5.500 MB/s) para jogo base + patches Day-1.',
+      lblScore: 'Score de Prontidão',
+      lblTarget: 'Modo Estimado',
+      titleRight: '🔍 Diagnóstico de Gargalos & Upgrades Recomendados',
+      subRight: 'Gargalos exatos detectados no seu setup atual e peças com melhor custo-benefício.',
+      upgradeHeading: '🛒 Upgrades Recomendados (Links Oficiais Verificados)',
+      viceTag: '🌴 Novo Pack — US$ 29',
+      viceTitle: 'ViceHeist_CreatorPack_V1 — HUD "6 Estrelas", Efeito Wasted/Busted & Transição Satélite',
+      viceDesc: 'Feito para YouTubers, Streamers e Cortes cobrindo Vice Miami e Leonida. 1 clique no DaVinci (.drfx), After Effects (.jsx) e OBS.',
+      viceCta: '⚡ Baixar ViceHeist Pack ($29) →',
+      freeSuffix: 'GB Livres',
+      amzBtn: 'Ver na Amazon →',
+      mlBtn: 'Mercado Livre →',
+      verdictGreat: 'Pronto pra Next-Gen (Sem Gargalos Graves)',
+      verdictGood: 'Roda Bem, Upgrade Pontual Recomendado',
+      verdictWarn: 'Gargalo Crítico Detectado',
+      msgStorageCrit: '🚨 Gargalo de Espaço: Apenas {gb} GB livres. O mapa + patches Day-1 exigem 160–200 GB livres em SSD rápido.',
+      msgStorageOk: '✅ Espaço OK: {gb} GB livres comportam o jogo e atualizações.',
+      msgTv60: '⚠️ Gargalo de Tela: TV 60Hz sem HDMI 2.1 bloqueia o modo 40fps VRR equilibrado e 120Hz de baixa latência.',
+      msgTvOk: '✅ Tela OK: HDMI 2.1 / Alta Taxa libera VRR e fluidez máxima.',
+      msgSeriesS: '⚠️ Limite do Console: Xbox Series S foca em 1080p–1440p upscaled (30fps) e sofre com espaço interno reduzido.',
+      msgPs5Pro: '✅ Vantagem PS5 Pro: Upscaling PSSR + 2TB internos prontos para Ray Tracing fluido.',
+      msgPcVramCrit: '🚨 Gargalo de VRAM ({vram}GB): Cidades densas com Ray Tracing pedem 12GB+ de VRAM para evitar engasgos em 1440p/4K.',
+      msgPcRamCrit: '⚠️ Gargalo de RAM (8GB): Subir para 16GB–32GB evita travamentos ao dirigir em alta velocidade.',
+      msgPcHddCrit: '🚨 Gargalo de Disco: HDD / SATA comum não acompanha o streaming de texturas (DirectStorage pede NVMe Gen4).'
+    }
+  };
+
+  function getAffiliateCards(needsSsd, needsTv, needsGpu, isPs5, isXbox) {
+    const isPt = lang === 'pt';
+    const amzDomain = isPt ? 'https://www.amazon.com.br/s' : 'https://www.amazon.com/s';
+    const cards = [];
+
+    if (needsSsd || isPs5) {
+      cards.push({
+        priority: needsSsd,
+        title: isPt
+          ? (isPs5 ? 'SSD NVMe Gen4 2TB c/ Dissipador (PS5 7.300MB/s)' : 'SSD NVMe M.2 Gen4 2TB Alta Velocidade')
+          : (isPs5 ? '2TB Gen4 NVMe SSD w/ Heatsink (PS5 7,300MB/s)' : '2TB Gen4 NVMe M.2 SSD (DirectStorage)'),
+        desc: isPt
+          ? 'Resolve a falta de espaço dos +150 GB e elimina telas de carregamento.'
+          : 'Eliminates 150GB+ storage bottlenecks and ultra-fast texture streaming.',
+        amz: `${amzDomain}?k=SSD+NVMe+2TB+Gen4+PS5+heatsink&tag=centraldea084-20`,
+        ml: `https://lista.mercadolivre.com.br/ssd-nvme-2tb-gen4-ps5-dissipador?matt_tool=mvinicius9355`
+      });
+    }
+
+    if (isXbox) {
+      cards.push({
+        priority: needsSsd,
+        title: isPt ? 'Cartão de Expansão SSD Xbox Series X|S 1TB/2TB' : 'Xbox Series X|S Storage Expansion Card 1TB/2TB',
+        desc: isPt
+          ? 'Único armazenamento externo que roda jogos Next-Gen nativamente no Xbox.'
+          : 'Official Velocity Architecture expansion required to run Series X|S native titles.',
+        amz: `${amzDomain}?k=Seagate+Storage+Expansion+Card+Xbox+Series&tag=centraldea084-20`,
+        ml: `https://lista.mercadolivre.com.br/cartao-expansao-xbox-series-1tb?matt_tool=mvinicius9355`
+      });
+    }
+
+    if (needsTv) {
+      cards.push({
+        priority: true,
+        title: isPt ? 'TV 4K 120Hz VRR HDMI 2.1 / Monitor Gamer 144Hz' : '4K 120Hz VRR HDMI 2.1 Gaming TV / 144Hz Monitor',
+        desc: isPt
+          ? 'Desbloqueia modo 40fps VRR e zero ghosting com HDMI 2.1 real.'
+          : 'Unlocks 40fps Balanced VRR, ALLM low-latency & crisp motion clarity.',
+        amz: `${amzDomain}?k=TV+4K+120Hz+HDMI+2.1+VRR+Gaming&tag=centraldea084-20`,
+        ml: `https://lista.mercadolivre.com.br/tv-4k-120hz-hdmi-2-1-vrr?matt_tool=mvinicius9355`
+      });
+    }
+
+    if (needsGpu) {
+      cards.push({
+        priority: true,
+        title: isPt ? 'Placa de Vídeo RTX 4070 / 12GB+ VRAM (DLSS 3/4)' : 'RTX 4070 / 12GB+ VRAM GPU (DLSS Frame Gen)',
+        desc: isPt
+          ? 'Evita quedas de FPS em Ray Tracing com Frame Generation e 12GB+ VRAM.'
+          : 'Prevents Ray Tracing VRAM stutters and enables DLSS Frame Generation.',
+        amz: `${amzDomain}?k=RTX+4070+12GB+Graphics+Card&tag=centraldea084-20`,
+        ml: `https://lista.mercadolivre.com.br/placa-de-video-rtx-4070-12gb?matt_tool=mvinicius9355`
+      });
+    }
+
+    // Always include DualSense / Pro Controller or Console Upgrade option
+    cards.push({
+      priority: false,
+      title: isPt ? 'Controle DualSense / Headset 3D Pulse & PS5 Pro' : 'DualSense Controller / 3D Gaming Headset & PS5 Pro',
+      desc: isPt
+        ? 'Feedback háptico adaptativo + áudio espacial 3D para máxima imersão.'
+        : 'Adaptive triggers + 3D spatial audio for immersive open-world sessions.',
+      amz: `${amzDomain}?k=PlayStation+5+DualSense+Controller+PS5+Pro&tag=centraldea084-20`,
+      ml: `https://lista.mercadolivre.com.br/controle-dualsense-ps5-pro?matt_tool=mvinicius9355`
+    });
+
+    return cards.slice(0, 3);
+  }
+
+  function renderNextGen() {
+    const t = i18n[lang];
+    const plat = platformEl.value;
+    const disp = displayEl.value;
+    const freeGb = parseInt(storageEl.value, 10) || 0;
+    const isPc = plat === 'pc-custom';
+    pcFieldsEl.style.display = isPc ? 'block' : 'none';
+
+    // Static text translation
+    document.getElementById('ng-title-left').textContent = t.titleLeft;
+    document.getElementById('ng-sub-left').textContent = t.subLeft;
+    document.getElementById('ng-lbl-platform').textContent = t.lblPlatform;
+    document.getElementById('ng-lbl-vram').textContent = t.lblVram;
+    document.getElementById('ng-lbl-ram').textContent = t.lblRam;
+    document.getElementById('ng-lbl-pc-ssd').textContent = t.lblPcSsd;
+    document.getElementById('ng-lbl-display').textContent = t.lblDisplay;
+    document.getElementById('ng-lbl-storage').textContent = t.lblStorage;
+    document.getElementById('ng-storage-hint').textContent = t.storageHint;
+    document.getElementById('ng-lbl-score').textContent = t.lblScore;
+    document.getElementById('ng-lbl-target').textContent = t.lblTarget;
+    document.getElementById('ng-title-right').textContent = t.titleRight;
+    document.getElementById('ng-sub-right').textContent = t.subRight;
+    document.getElementById('ng-upgrade-heading').textContent = t.upgradeHeading;
+    document.getElementById('ng-vice-tag').textContent = t.viceTag;
+    document.getElementById('ng-vice-title').textContent = t.viceTitle;
+    document.getElementById('ng-vice-desc').textContent = t.viceDesc;
+    document.getElementById('ng-vice-cta').textContent = t.viceCta;
+    document.getElementById('ng-storage-val').textContent = `${freeGb} ${t.freeSuffix}`;
+
+    let score = 95;
+    let targetFps = '1440p–4K / 60fps';
+    let targetTier = 'Performance / VRR';
+    const findings = [];
+
+    let needsSsd = false;
+    let needsTv = false;
+    let needsGpu = false;
+
+    if (plat === 'ps5-pro') {
+      score = 100;
+      targetFps = '4K PSSR / 60fps RT';
+      targetTier = 'Flagship Console';
+      findings.push({ type: 'ok', text: t.msgPs5Pro });
+    } else if (plat === 'ps5-base' || plat === 'xbox-x') {
+      score = 88;
+      targetFps = '1440p–4K / 30–60fps';
+      targetTier = 'Next-Gen Standard';
+    } else if (plat === 'xbox-s') {
+      score = 62;
+      targetFps = '1080p / 30fps';
+      targetTier = 'Entry Next-Gen';
+      findings.push({ type: 'warn', text: t.msgSeriesS });
+    } else if (isPc) {
+      const vram = parseInt(vramEl.value, 10);
+      const ram = parseInt(ramEl.value, 10);
+      const pcSsd = pcSsdEl.value;
+      score = 92;
+      targetFps = '1440p / 60–90fps';
+      targetTier = 'DLSS / FSR Ready';
+
+      if (vram < 12) {
+        score -= vram <= 6 ? 32 : 16;
+        needsGpu = true;
+        targetFps = vram <= 6 ? '1080p Low / 30fps' : '1080p–1440p / 45–60fps';
+        findings.push({ type: 'crit', text: t.msgPcVramCrit.replace('{vram}', vram) });
+      }
+      if (ram < 16) {
+        score -= 14;
+        findings.push({ type: 'warn', text: t.msgPcRamCrit });
+      }
+      if (pcSsd === 'hdd') {
+        score -= 22;
+        needsSsd = true;
+        findings.push({ type: 'crit', text: t.msgPcHddCrit });
+      } else if (pcSsd === 'gen3') {
+        score -= 5;
+      }
+    }
+
+    if (freeGb < 180) {
+      score -= freeGb < 100 ? 24 : 14;
+      needsSsd = true;
+      findings.push({ type: 'crit', text: t.msgStorageCrit.replace('{gb}', freeGb) });
+    } else {
+      findings.push({ type: 'ok', text: t.msgStorageOk.replace('{gb}', freeGb) });
+    }
+
+    if (disp === 'tv-60') {
+      score -= 12;
+      needsTv = true;
+      findings.push({ type: 'warn', text: t.msgTv60 });
+    } else {
+      findings.push({ type: 'ok', text: t.msgTvOk });
+    }
+
+    score = Math.max(15, Math.min(100, score));
+
+    const scoreEl = document.getElementById('ng-out-score');
+    const verdictEl = document.getElementById('ng-out-verdict');
+    const barEl = document.getElementById('ng-score-bar');
+
+    scoreEl.textContent = `${score}%`;
+    document.getElementById('ng-out-fps').textContent = targetFps;
+    document.getElementById('ng-out-tier').textContent = targetTier;
+    barEl.style.width = `${score}%`;
+
+    if (score >= 82) {
+      verdictEl.textContent = t.verdictGreat;
+      barEl.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
+    } else if (score >= 58) {
+      verdictEl.textContent = t.verdictGood;
+      barEl.style.background = 'linear-gradient(90deg, #f59e0b, #10b981)';
+    } else {
+      verdictEl.textContent = t.verdictWarn;
+      barEl.style.background = 'linear-gradient(90deg, #f43f5e, #f59e0b)';
+    }
+
+    const listEl = document.getElementById('ng-bottleneck-list');
+    listEl.innerHTML = findings
+      .map((f) => `<li class="bottleneck-item ${f.type === 'ok' ? 'ok' : f.type === 'warn' ? 'warn' : ''}">${f.text}</li>`)
+      .join('');
+
+    const cards = getAffiliateCards(
+      needsSsd,
+      needsTv,
+      needsGpu,
+      plat === 'ps5-base' || plat === 'ps5-pro',
+      plat === 'xbox-s' || plat === 'xbox-x'
+    );
+
+    const gridEl = document.getElementById('ng-affiliate-grid');
+    gridEl.innerHTML = cards
+      .map(
+        (c) => `
+      <div class="affiliate-card ${c.priority ? 'priority' : ''}">
+        <div>
+          <h4>${c.title}</h4>
+          <p>${c.desc}</p>
+        </div>
+        <div class="affiliate-actions">
+          <a href="${c.amz}" target="_blank" rel="noopener sponsored" class="btn-amz">${t.amzBtn}</a>
+          <a href="${c.ml}" target="_blank" rel="noopener sponsored" class="btn-ml">${t.mlBtn}</a>
+        </div>
+      </div>
+    `
+      )
+      .join('');
+  }
+
+  langBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      langBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      lang = btn.getAttribute('data-lang') || 'en';
+      renderNextGen();
+    });
+  });
+
+  [platformEl, vramEl, ramEl, pcSsdEl, displayEl, storageEl].forEach((el) => {
+    el.addEventListener('input', renderNextGen);
+    el.addEventListener('change', renderNextGen);
+  });
+
+  renderNextGen();
 }

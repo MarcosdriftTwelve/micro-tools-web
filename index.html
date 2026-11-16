@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CreatorCalc & UtilityHub (2026) — Roblox DevEx Calculator, YouTube RPM & Thumbnail Safe-Zone Tester, 4x6 Thermal Label Cropper & 4x8 Cut-List Optimizer</title>
-  <meta name="description" content="Free 100% client-side browser tools: Updated 2026 Roblox DevEx ($0.0038 & +42% US 18+ Boost) & Marketplace Tax Calculator, YouTube Shorts vs Long-Form RPM Estimator + Live Mobile Thumbnail & Safe-Zone Previewer, 8.5x11 to 4x6 Thermal Label Cropper, and 4x8 Plywood Cut-List + Client Quote PDF Generator." />
-  <meta name="keywords" content="roblox devex calculator 2026, robux to usd calculator 0.0038, roblox marketplace tax calculator, youtube shorts rpm calculator, youtube thumbnail mobile previewer, tiktok shorts safe zone overlay checker, 8.5x11 to 4x6 thermal label cropper online, 4x8 plywood cut list optimizer free pdf quote" />
+  <title>CreatorCalc &amp; UtilityHub (2026) — Roblox DevEx, YouTube RPM, 4x6 Thermal Label, 4x8 Cut-List &amp; GTA 6 Next-Gen Hardware Checker</title>
+  <meta name="description" content="Free 100% client-side browser tools: Updated 2026 Roblox DevEx &amp; Marketplace Tax Calculator, YouTube Shorts vs Long-Form RPM + Safe-Zone Previewer, 4x6 Thermal Label Cropper, 4x8 Cut-List PDF, and GTA 6 / Vice City Next-Gen Hardware, PS5 SSD &amp; 120Hz TV Bottleneck Checker." />
+  <meta name="keywords" content="roblox devex calculator 2026, youtube shorts rpm calculator, 8.5x11 to 4x6 thermal label cropper, 4x8 plywood cut list optimizer, gta 6 pc requirements checker, ps5 ssd heatsink calculator, 120hz vrr tv gaming bottleneck checker" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://marcosdrifttwelve.github.io/micro-tools-web/" />
 
@@ -81,6 +81,7 @@
         <button class="nav-tab" data-target="panel-youtube" role="tab" aria-selected="false">📺 YouTube RPM + Thumbnail &amp; Safe-Zone</button>
         <button class="nav-tab" data-target="panel-thermal" role="tab" aria-selected="false">📦 4x6" Thermal Label Cropper</button>
         <button class="nav-tab" data-target="panel-cutlist" role="tab" aria-selected="false">🪚 4x8 Cut-List + Client Quote PDF</button>
+        <button class="nav-tab" data-target="panel-nextgen" role="tab" aria-selected="false">🌴 GTA 6 / Next-Gen Hardware Checker</button>
       </nav>
     </div>
   </header>
@@ -512,6 +513,134 @@
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TOOL 5: GTA 6 / NEXT-GEN HARDWARE, PS5 SSD & 120HZ TV CHECKER       -->
+    <!-- =================================================================== -->
+    <section id="panel-nextgen" class="tool-panel" role="tabpanel">
+      <div class="grid-2">
+        <!-- Input Card -->
+        <div class="card">
+          <div class="card-title">
+            <span id="ng-title-left">🌴 GTA 6 / Vice City Next-Gen Hardware Checker</span>
+            <div class="lang-toggle" role="group" aria-label="Language Toggle">
+              <button type="button" class="lang-btn active" data-lang="en">🇺🇸 EN</button>
+              <button type="button" class="lang-btn" data-lang="pt">🇧🇷 PT-BR</button>
+            </div>
+          </div>
+          <p class="card-subtitle" id="ng-sub-left">Independent 2026 readiness estimator for open-world next-gen titles (+150 GB NVMe, Ray Tracing &amp; HDMI 2.1 120Hz VRR).</p>
+
+          <div class="form-group">
+            <label for="ng-platform">
+              <span id="ng-lbl-platform">Your Current Gaming Platform</span>
+            </label>
+            <select id="ng-platform" class="input-control">
+              <option value="ps5-base">PlayStation 5 (Base / Slim)</option>
+              <option value="ps5-pro">PlayStation 5 Pro (PSSR / 2TB)</option>
+              <option value="xbox-s">Xbox Series S (512GB / 1TB)</option>
+              <option value="xbox-x">Xbox Series X (4K Native)</option>
+              <option value="pc-custom">PC Custom (Select GPU / RAM / SSD)</option>
+            </select>
+          </div>
+
+          <div id="ng-pc-fields" style="display: none;">
+            <div class="grid-2" style="gap: 12px;">
+              <div class="form-group">
+                <label for="ng-pc-vram"><span id="ng-lbl-vram">GPU VRAM</span></label>
+                <select id="ng-pc-vram" class="input-control">
+                  <option value="6">6GB or less (GTX 1660 / RTX 2060)</option>
+                  <option value="8" selected>8GB (RTX 3060 Ti / 4060)</option>
+                  <option value="12">12GB (RTX 3060 12G / 4070)</option>
+                  <option value="16">16GB+ (RTX 4070 Ti S / 4080 / 5080)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="ng-pc-ram"><span id="ng-lbl-ram">System RAM</span></label>
+                <select id="ng-pc-ram" class="input-control">
+                  <option value="8">8GB DDR4</option>
+                  <option value="16" selected>16GB DDR4/DDR5</option>
+                  <option value="32">32GB+ DDR5</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="ng-pc-ssd"><span id="ng-lbl-pc-ssd">Storage Drive Type</span></label>
+              <select id="ng-pc-ssd" class="input-control">
+                <option value="hdd">Mechanical HDD / Slow SATA SSD</option>
+                <option value="gen3">NVMe M.2 Gen3 (Up to 3,500 MB/s)</option>
+                <option value="gen4" selected>NVMe M.2 Gen4+ (5,500–7,400 MB/s)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="ng-display">
+              <span id="ng-lbl-display">Display / TV Type</span>
+            </label>
+            <select id="ng-display" class="input-control">
+              <option value="tv-60">TV 60Hz (1080p / 4K without HDMI 2.1)</option>
+              <option value="tv-120">TV 4K 120Hz VRR (HDMI 2.1 OLED / QLED / MiniLED)</option>
+              <option value="mon-144">Gaming Monitor 144Hz+ (1440p / 4K)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="ng-storage">
+              <span id="ng-lbl-storage">Free SSD Storage Space (GB)</span>
+              <span id="ng-storage-val">120 GB Free</span>
+            </label>
+            <input type="range" id="ng-storage" min="20" max="1000" step="10" value="120" />
+            <small id="ng-storage-hint" style="color: var(--text-muted); font-size: 0.78rem;">
+              Recommended: 200+ GB free on Gen4 NVMe (>= 5,500 MB/s) for base install + Day-1 patches.
+            </small>
+          </div>
+
+          <div class="metrics-grid" style="margin-top: 14px;">
+            <div class="metric-box highlight">
+              <div class="metric-label" id="ng-lbl-score">Readiness Score</div>
+              <div class="metric-value" id="ng-out-score">68%</div>
+              <div class="metric-sub" id="ng-out-verdict">Good Console, Storage Bottleneck</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label" id="ng-lbl-target">Estimated Target Mode</div>
+              <div class="metric-value" id="ng-out-fps">1440p / 60fps*</div>
+              <div class="metric-sub" id="ng-out-tier">Upscaled Fidelity / VRR</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output & Affiliate Upgrade Recommendations Card -->
+        <div class="card">
+          <div class="card-title">
+            <span id="ng-title-right">🔍 Bottleneck Diagnosis &amp; Recommended Upgrades</span>
+          </div>
+          <p class="card-subtitle" id="ng-sub-right">Exact hardware gaps detected for your setup and highest-ROI upgrade picks.</p>
+
+          <div class="score-bar-track">
+            <div class="score-bar-fill" id="ng-score-bar"></div>
+          </div>
+
+          <ul class="bottleneck-list" id="ng-bottleneck-list"></ul>
+
+          <div class="card-title" style="font-size: 0.98rem; margin-top: 14px;">
+            <span id="ng-upgrade-heading">🛒 Best-Value Verified Upgrades for Your Setup</span>
+          </div>
+          <div class="affiliate-grid" id="ng-affiliate-grid"></div>
+        </div>
+      </div>
+
+      <!-- ViceHeist_CreatorPack_V1 ($29) Banner -->
+      <aside class="vice-banner" aria-label="ViceHeist Creator Pack Promotion">
+        <div class="promo-content">
+          <span class="promo-tag" id="ng-vice-tag">🌴 New Release — $29 USD</span>
+          <h3 id="ng-vice-title">ViceHeist_CreatorPack_V1 — "6 Stars Wanted" HUD, Wasted/Busted Freeze &amp; Satellite Switch</h3>
+          <p id="ng-vice-desc">Made for Gaming YouTubers, Streamers &amp; Clippers covering Vice Miami &amp; Leonida news. 1-click `.drfx` (DaVinci Resolve) + `.jsx` (After Effects) + OBS Stream Overlays.</p>
+        </div>
+        <a href="https://gumroad.com/" target="_blank" rel="noopener" class="btn-promo" id="ng-vice-cta">
+          ⚡ Get ViceHeist Pack ($29) →
+        </a>
+      </aside>
     </section>
 
     <!-- Bottom AdSense Slot -->
