@@ -16,6 +16,9 @@
   <meta property="og:url" content="https://marcosdrifttwelve.github.io/micro-tools-web/" />
 
   <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=JetBrains+Mono:wght@700;800&family=Yellowtail&display=swap" rel="stylesheet" />
 
   <!-- JSON-LD Structured Data for Google Rich Snippets -->
   <script type="application/ld+json">
@@ -692,22 +695,27 @@
           </div>
 
           <div class="form-group">
-            <label style="justify-content: flex-start; gap: 10px; cursor: pointer;">
-              <input type="checkbox" id="vp-transparent" checked style="width: 18px; height: 18px; accent-color: #ec4899;" />
-              <span>Transparent Background (Alpha PNG Overlay for CapCut / Premiere Pro)</span>
+            <label for="vp-bg-mode">
+              <span>Export Background Mode (Premiere / CapCut Compatibility)</span>
             </label>
+            <select id="vp-bg-mode" class="input-control">
+              <option value="alpha" selected>🏁 Transparent Alpha (PNG / Pro Overlay)</option>
+              <option value="greenscreen">🟩 Chroma Key Green #00FF00 (100% CapCut &amp; Premiere WebM Safe)</option>
+              <option value="scene">🌴 Vice Miami Sunset Scene / Your Uploaded Photo</option>
+            </select>
           </div>
 
           <div class="dropzone" id="vp-dropzone" style="padding: 14px; margin-bottom: 12px;">
             <input type="file" id="vp-file-input" accept="image/*" style="display:none;" />
             <strong>🖼️ Optional: Drop Your Gameplay Frame / Photo (16:9)</strong>
-            <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 2px;">Uncheck Transparent Background above to bake the effect onto your image</div>
+            <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 2px;">Automatically switches to Scene Mode when you drop an image</div>
           </div>
 
           <div class="btn-row">
             <button type="button" class="btn btn-emerald" id="btn-vp-download-png">⬇ Download PNG (1920×1080)</button>
-            <button type="button" class="btn" id="btn-vp-export-webm" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);">🎬 Export Animated Overlay (.WebM 3s)</button>
-            <button type="button" class="btn btn-secondary" id="btn-vp-download-lut">🎨 Download Vice Neon LUT (.CUBE)</button>
+            <button type="button" class="btn" id="btn-vp-export-webm" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);">🎬 Export Animated (.WebM 3s)</button>
+            <button type="button" class="btn btn-secondary" id="btn-vp-download-svg">📐 Editable Vector (.SVG)</button>
+            <button type="button" class="btn btn-secondary" id="btn-vp-download-lut">🎨 Vice Neon LUT (.CUBE)</button>
           </div>
           <div id="vp-export-status" style="font-size: 0.8rem; color: #34d399; margin-top: 8px; min-height: 18px;"></div>
         </div>

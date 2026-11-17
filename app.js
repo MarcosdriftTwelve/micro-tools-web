@@ -1150,7 +1150,7 @@ function initVicePackStudio() {
   const starsEl = document.getElementById('vp-stars');
   const starsValEl = document.getElementById('vp-stars-val');
   const cashEl = document.getElementById('vp-cash');
-  const transparentEl = document.getElementById('vp-transparent');
+  const bgModeEl = document.getElementById('vp-bg-mode');
   const canvas = document.getElementById('vp-canvas');
   const ctx = canvas.getContext('2d');
   const statusEl = document.getElementById('vp-export-status');
@@ -1164,21 +1164,171 @@ function initVicePackStudio() {
     'thumb-neon': { main: 'VICE MIAMI', sub: '6 STARS IN 60 SECONDS' }
   };
 
+  // Vector Star Path Helper (crisp HUD stars with thick outline)
+  function drawStar(c, cx, cy, outerR, innerR, fill, stroke, glowColor) {
+    c.save();
+    c.beginPath();
+    for (let i = 0; i < 10; i++) {
+      const r = i % 2 === 0 ? outerR : innerR;
+      const angle = (Math.PI / 5) * i - Math.PI / 2;
+      const x = cx + Math.cos(angle) * r;
+      const y = cy + Math.sin(angle) * r;
+      if (i === 0) c.moveTo(x, y);
+      else c.lineTo(x, y);
+    }
+    c.closePath();
+    if (glowColor) {
+      c.shadowColor = glowColor;
+      c.shadowBlur = outerR * 0.65;
+    }
+    c.fillStyle = fill;
+    c.fill();
+    c.shadowBlur = 0;
+    c.lineWidth = Math.max(2, outerR * 0.16);
+    c.strokeStyle = stroke;
+    c.stroke();
+    c.restore();
+  }
+
+  // Vector Palm Silhouette Helper for Synthwave Scene
+  function drawPalmTree(c, baseX, baseY, scale, flip) {
+    c.save();
+    c.translate(baseX, baseY);
+    c.scale(flip ? -scale : scale, scale);
+    c.fillStyle = '#070312';
+
+    // Curved trunk
+    c.beginPath();
+    c.moveTo(-12, 0);
+    c.quadraticCurveTo(15, -140, 48, -260);
+    c.lineTo(62, -258);
+    c.quadraticCurveTo(32, -140, 12, 0);
+    c.closePath();
+    c.fill();
+
+    // Fronds
+    const fronds = [
+      { ang: -2.6, len: 130, curve: 38 },
+      { ang: -2.0, len: 145, curve: 32 },
+      { ang: -1.2, len: 135, curve: 26 },
+      { ang: -0.4, len: 145, curve: 34 },
+      { ang: 0.25, len: 125, curve: 42 },
+      { ang: 0.85, len: 105, curve: 36 }
+    ];
+    fronds.forEach((f) => {
+      c.save();
+      c.translate(54, -256);
+      c.rotate(f.ang);
+      c.beginPath();
+      c.moveTo(0, 0);
+      c.quadraticCurveTo(f.len * 0.5, -f.curve, f.len, 16);
+      c.quadraticCurveTo(f.len * 0.5, -f.curve * 0.25, 0, 10);
+      c.closePath();
+      c.fill();
+      c.restore();
+    });
+    c.restore();
+  }
+
+  // Outrun Sliced Sun + Palms + Perspective Grid Background
+  function drawViceMiamiScene(c, w, h) {
+    const sky = c.createLinearGradient(0, 0, 0, h * 0.68);
+    sky.addColorStop(0, '#090218');
+    sky.addColorStop(0.45, '#3b0764');
+    sky.addColorStop(0.82, '#be185d');
+    sky.addColorStop(1, '#fb923c');
+    c.fillStyle = sky;
+    c.fillRect(0, 0, w, h);
+
+    // Outrun Sun with horizontal slice cutouts
+    const sunX = w * 0.5;
+    const sunY = h * 0.42;
+    const sunR = h * 0.27;
+    const sunGrad = c.createLinearGradient(0, sunY - sunR, 0, sunY + sunR);
+    sunGrad.addColorStop(0, '#fef08a');
+    sunGrad.addColorStop(0.5, '#fb923c');
+    sunGrad.addColorStop(1, '#ec4899');
+
+    c.save();
+    c.beginPath();
+    c.arc(sunX, sunY, sunR, 0, Math.PI * 2);
+    c.clip();
+    c.fillStyle = sunGrad;
+    c.fillRect(sunX - sunR, sunY - sunR, sunR * 2, sunR * 2);
+    // Retro scanline slices in lower half of sun
+    c.fillStyle = '#3b0764';
+    for (let i = 0; i < 6; i++) {
+      const sliceY = sunY + sunR * (0.1 + i * 0.14);
+      const sliceH = 3 + i * 2.5;
+      c.fillRect(sunX - sunR, sliceY, sunR * 2, sliceH);
+    }
+    c.restore();
+
+    // Horizon Glow + Neon Grid Floor
+    const horizon = h * 0.64;
+    c.fillStyle = '#060312';
+    c.fillRect(0, horizon, w, h - horizon);
+
+    c.save();
+    c.strokeStyle = 'rgba(34, 211, 238, 0.55)';
+    c.lineWidth = Math.max(1.5, w * 0.0018);
+    c.shadowColor = '#22d3ee';
+    c.shadowBlur = 10;
+    for (let i = -14; i <= 14; i++) {
+      c.beginPath();
+      c.moveTo(w / 2 + i * (w * 0.032), horizon);
+      c.lineTo(w / 2 + i * (w * 0.15), h);
+      c.stroke();
+    }
+    for (let step = 0; step < 9; step++) {
+      const t = step / 8;
+      const y = horizon + Math.pow(t, 1.9) * (h - horizon);
+      c.beginPath();
+      c.moveTo(0, y);
+      c.lineTo(w, y);
+      c.stroke();
+    }
+    c.restore();
+
+    // Distant City Skyline Silhouette
+    c.fillStyle = '#090418';
+    const bWidths = [42, 28, 55, 34, 68, 30, 48, 60, 38, 52, 44, 64, 32, 50];
+    let bx = 0;
+    let bi = 0;
+    while (bx < w) {
+      const bw = (bWidths[bi % bWidths.length] / 960) * w;
+      const bh = ((35 + ((bi * 37) % 85)) / 540) * h;
+      c.fillRect(bx, horizon - bh, bw - 2, bh);
+      bx += bw;
+      bi++;
+    }
+
+    // Framing Palm Trees
+    drawPalmTree(c, w * 0.08, h * 0.92, h / 460, false);
+    drawPalmTree(c, w * 0.92, h * 0.94, h / 440, true);
+  }
+
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
+  }
+
   presetEl.addEventListener('change', () => {
     const def = presetDefaults[presetEl.value];
     if (def) {
       mainTextEl.value = def.main;
       subTextEl.value = def.sub;
     }
-    if (presetEl.value === 'thumb-neon') {
-      transparentEl.checked = false;
+    if (presetEl.value === 'thumb-neon' && bgModeEl.value === 'alpha') {
+      bgModeEl.value = 'scene';
     }
-    drawViceFrame(ctx, canvas.width, canvas.height, 0);
+    drawViceFrame(ctx, canvas.width, canvas.height, 1.0);
   });
 
-  function drawViceFrame(c, w, h, animPhase) {
+  // progress: 0..1 during 3s animation, or 1.0 for static high-res frame
+  function drawViceFrame(c, w, h, progress) {
     const preset = presetEl.value;
-    const isAlpha = transparentEl.checked;
+    const bgMode = bgModeEl.value;
+    const isAlpha = bgMode === 'alpha';
     const mainTxt = (mainTextEl.value || 'WASTED').toUpperCase();
     const subTxt = (subTextEl.value || '').toUpperCase();
     const stars = parseInt(starsEl.value, 10) || 6;
@@ -1187,187 +1337,241 @@ function initVicePackStudio() {
     starsValEl.textContent = `${stars} ★`;
     c.clearRect(0, 0, w, h);
 
-    // Background layer (only if not transparent)
-    if (!isAlpha) {
+    // 1. Background Layer
+    if (bgMode === 'greenscreen') {
+      c.fillStyle = '#00FF00';
+      c.fillRect(0, 0, w, h);
+    } else if (bgMode === 'scene') {
       if (userBgImg) {
         c.save();
         if (preset === 'wasted') {
-          c.filter = 'grayscale(78%) contrast(1.2) brightness(0.72)';
+          c.filter = 'grayscale(85%) contrast(1.28) brightness(0.68)';
         }
         c.drawImage(userBgImg, 0, 0, w, h);
         c.restore();
       } else {
-        // Procedural Vice Miami Synthwave Sunset + Neon Grid
-        const sky = c.createLinearGradient(0, 0, 0, h);
-        sky.addColorStop(0, '#0f0524');
-        sky.addColorStop(0.5, '#581c87');
-        sky.addColorStop(0.75, '#ec4899');
-        sky.addColorStop(1, '#090d16');
-        c.fillStyle = sky;
-        c.fillRect(0, 0, w, h);
-
-        // Retro Sunset Sun
-        const sunGrad = c.createLinearGradient(0, h * 0.18, 0, h * 0.58);
-        sunGrad.addColorStop(0, '#fde047');
-        sunGrad.addColorStop(0.6, '#f97316');
-        sunGrad.addColorStop(1, '#ec4899');
-        c.beginPath();
-        c.arc(w / 2, h * 0.42, h * 0.22, 0, Math.PI * 2);
-        c.fillStyle = sunGrad;
-        c.fill();
-
-        // Perspective Neon Grid
-        c.strokeStyle = 'rgba(34, 211, 238, 0.35)';
-        c.lineWidth = 1.5;
-        const horizon = h * 0.62;
-        for (let i = -10; i <= 10; i++) {
-          c.beginPath();
-          c.moveTo(w / 2 + i * (w * 0.04), horizon);
-          c.lineTo(w / 2 + i * (w * 0.16), h);
-          c.stroke();
-        }
-        for (let y = horizon; y < h; y += (y - horizon) * 0.25 + 10) {
-          c.beginPath();
-          c.moveTo(0, y);
-          c.lineTo(w, y);
-          c.stroke();
-        }
+        drawViceMiamiScene(c, w, h);
       }
     }
 
-    // Siren pulse factor for animated WebM (0..1)
-    const pulse = 0.5 + 0.5 * Math.sin(animPhase * Math.PI * 2);
+    const pulse = 0.5 + 0.5 * Math.sin(progress * Math.PI * 6);
+    const enterT = easeOutCubic(Math.min(1, progress * 3.5)); // First ~0.85s entrance
 
+    // 2. Preset Renderers
     if (preset === 'wasted') {
-      // Dark cinematic letterbox band
-      const bandH = h * 0.28;
+      // Camera punch zoom + micro-shake during entrance
+      const shakeX = progress < 0.35 ? (Math.sin(progress * 90) * (w * 0.008) * (1 - progress * 2.8)) : 0;
+      const shakeY = progress < 0.35 ? (Math.cos(progress * 110) * (h * 0.008) * (1 - progress * 2.8)) : 0;
+      const zoom = 1.18 - 0.18 * enterT;
+
+      c.save();
+      c.translate(w / 2 + shakeX, h / 2 + shakeY);
+      c.scale(zoom, zoom);
+      c.translate(-w / 2, -h / 2);
+
+      // Red/Blue Siren Vignette (only on scene mode so Chroma Key stays clean)
+      if (bgMode === 'scene') {
+        const redGlow = c.createRadialGradient(w * 0.18, h * 0.5, 10, w * 0.18, h * 0.5, w * 0.6);
+        redGlow.addColorStop(0, `rgba(244, 63, 94, ${0.28 + pulse * 0.2})`);
+        redGlow.addColorStop(1, 'rgba(0,0,0,0)');
+        c.fillStyle = redGlow;
+        c.fillRect(0, 0, w, h);
+
+        const blueGlow = c.createRadialGradient(w * 0.82, h * 0.5, 10, w * 0.82, h * 0.5, w * 0.6);
+        blueGlow.addColorStop(0, `rgba(34, 211, 238, ${0.24 + (1 - pulse) * 0.2})`);
+        blueGlow.addColorStop(1, 'rgba(0,0,0,0)');
+        c.fillStyle = blueGlow;
+        c.fillRect(0, 0, w, h);
+      }
+
+      // Letterbox Center Band with Neon Accent Borders
+      const bandH = h * 0.32;
       const bandY = (h - bandH) / 2;
       const bandGrad = c.createLinearGradient(0, bandY, 0, bandY + bandH);
-      bandGrad.addColorStop(0, 'rgba(0,0,0,0)');
-      bandGrad.addColorStop(0.2, 'rgba(0,0,0,0.82)');
-      bandGrad.addColorStop(0.8, 'rgba(0,0,0,0.82)');
-      bandGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      bandGrad.addColorStop(0, 'rgba(8, 10, 18, 0.94)');
+      bandGrad.addColorStop(0.5, 'rgba(15, 18, 30, 0.96)');
+      bandGrad.addColorStop(1, 'rgba(8, 10, 18, 0.94)');
       c.fillStyle = bandGrad;
       c.fillRect(0, bandY, w, bandH);
 
-      // Red/Blue subtle corner siren glow
-      if (!isAlpha) {
-        c.fillStyle = `rgba(244, 63, 94, ${0.12 + pulse * 0.12})`;
-        c.fillRect(0, 0, w * 0.5, h);
-        c.fillStyle = `rgba(59, 130, 246, ${0.12 + (1 - pulse) * 0.12})`;
-        c.fillRect(w * 0.5, 0, w * 0.5, h);
-      }
+      c.fillStyle = '#f43f5e';
+      c.fillRect(0, bandY, w, Math.max(3, h * 0.006));
+      c.fillStyle = '#22d3ee';
+      c.fillRect(0, bandY + bandH - Math.max(3, h * 0.006), w, Math.max(3, h * 0.006));
 
-      c.save();
+      // Chromatic Aberration (RGB Split) + Thick Black Outline on Headline
+      const fontPx = Math.round(h * 0.175);
+      c.font = `900 ${fontPx}px "Anton", Impact, "Arial Black", sans-serif`;
       c.textAlign = 'center';
-      c.shadowColor = '#f43f5e';
-      c.shadowBlur = 24 + pulse * 14;
-      c.fillStyle = '#fb7185';
-      c.font = `900 ${Math.round(h * 0.15)}px Impact, "Arial Black", sans-serif`;
-      c.fillText(mainTxt, w / 2, h / 2 + h * 0.02);
+      c.textBaseline = 'middle';
 
-      c.shadowBlur = 6;
-      c.shadowColor = '#000';
+      const rgbOffset = Math.max(3, w * 0.0045);
+      c.fillStyle = 'rgba(34, 211, 238, 0.78)';
+      c.fillText(mainTxt, w / 2 - rgbOffset, h / 2 - h * 0.032);
+      c.fillStyle = 'rgba(244, 63, 94, 0.82)';
+      c.fillText(mainTxt, w / 2 + rgbOffset, h / 2 - h * 0.028);
+
+      c.lineWidth = Math.max(6, fontPx * 0.09);
+      c.strokeStyle = '#000000';
+      c.strokeText(mainTxt, w / 2, h / 2 - h * 0.03);
+
+      const txtGrad = c.createLinearGradient(0, h * 0.38, 0, h * 0.54);
+      txtGrad.addColorStop(0, '#ffffff');
+      txtGrad.addColorStop(0.55, '#fda4af');
+      txtGrad.addColorStop(1, '#f43f5e');
+      c.fillStyle = txtGrad;
+      c.fillText(mainTxt, w / 2, h / 2 - h * 0.03);
+
+      // Subtitle
+      const subPx = Math.round(h * 0.044);
+      c.font = `800 ${subPx}px "Bebas Neue", Inter, Arial, sans-serif`;
+      c.lineWidth = Math.max(3, subPx * 0.14);
+      c.strokeStyle = '#000000';
+      c.strokeText(subTxt, w / 2, h / 2 + h * 0.088);
       c.fillStyle = '#f8fafc';
-      c.font = `700 ${Math.round(h * 0.04)}px Inter, Arial, sans-serif`;
-      c.fillText(subTxt, w / 2, h / 2 + h * 0.09);
+      c.fillText(subTxt, w / 2, h / 2 + h * 0.088);
       c.restore();
     } else if (preset === 'wanted-hud') {
-      // Top-Right Cash + Stars + Time HUD
-      const pad = w * 0.04;
+      const pad = w * 0.045;
+      // Animated Cash Counter & Sequential Stars during WebM
+      const activeStars = progress < 0.9 ? Math.max(1, Math.ceil(stars * Math.min(1, progress * 1.6))) : stars;
+
       c.save();
+      // Top-Right Cash HUD (JetBrains Mono + Thick Stroke)
       c.textAlign = 'right';
-      c.shadowColor = 'rgba(0,0,0,0.9)';
-      c.shadowBlur = 8;
-
-      // Cash Counter
+      const cashPx = Math.round(h * 0.085);
+      c.font = `800 ${cashPx}px "JetBrains Mono", "Courier New", monospace`;
+      c.lineWidth = Math.max(5, cashPx * 0.14);
+      c.strokeStyle = '#020617';
+      c.strokeText(cashTxt, w - pad, pad + cashPx * 0.85);
       c.fillStyle = '#4ade80';
-      c.font = `900 ${Math.round(h * 0.075)}px "Courier New", monospace`;
-      c.fillText(cashTxt, w - pad, pad + h * 0.06);
+      c.fillText(cashTxt, w - pad, pad + cashPx * 0.85);
 
-      // 6 Stars Row
-      const starSize = Math.round(h * 0.058);
-      c.font = `900 ${starSize}px Arial, sans-serif`;
+      // 6 Vector Stars with Outer Black Outline & Gold Gradient
+      const starR = h * 0.033;
+      const starGap = starR * 2.35;
+      const starY = pad + cashPx * 1.48;
       for (let i = 0; i < 6; i++) {
-        const isLit = i < stars;
-        const flashOn = isLit && (pulse > 0.35 || i % 2 === 0);
-        c.fillStyle = flashOn ? '#facc15' : 'rgba(255,255,255,0.22)';
-        c.shadowColor = flashOn ? '#f59e0b' : '#000';
-        c.shadowBlur = flashOn ? 14 : 2;
-        c.fillText('★', w - pad - (5 - i) * (starSize * 1.05), pad + h * 0.135);
+        const sx = w - pad - starR - (5 - i) * starGap;
+        const isLit = i < activeStars;
+        const isBlink = isLit && (i === activeStars - 1 ? pulse > 0.35 : true);
+        drawStar(
+          c,
+          sx,
+          starY,
+          starR,
+          starR * 0.44,
+          isBlink ? '#facc15' : 'rgba(15, 23, 42, 0.72)',
+          '#000000',
+          isBlink ? '#f59e0b' : null
+        );
       }
 
-      // Mission Tag Top-Left
+      // Top-Left Mission / District Badge (Slide in from left)
+      const slideX = -w * 0.4 * (1 - enterT);
+      const boxW = w * 0.36;
+      const boxH = h * 0.115;
+      c.translate(slideX, 0);
+      c.fillStyle = 'rgba(10, 14, 26, 0.92)';
+      c.fillRect(pad, pad, boxW, boxH);
+      c.fillStyle = '#ec4899';
+      c.fillRect(pad, pad, Math.max(6, w * 0.008), boxH);
+      c.strokeStyle = 'rgba(255,255,255,0.18)';
+      c.lineWidth = 2;
+      c.strokeRect(pad, pad, boxW, boxH);
+
       c.textAlign = 'left';
-      c.fillStyle = 'rgba(15, 23, 42, 0.84)';
-      c.fillRect(pad, pad, w * 0.34, h * 0.1);
-      c.strokeStyle = '#ec4899';
-      c.lineWidth = 3;
-      c.strokeRect(pad, pad, w * 0.34, h * 0.1);
       c.fillStyle = '#22d3ee';
-      c.font = `800 ${Math.round(h * 0.032)}px Inter, sans-serif`;
-      c.fillText(mainTxt, pad + 14, pad + h * 0.045);
-      c.fillStyle = '#f8fafc';
-      c.font = `600 ${Math.round(h * 0.024)}px Inter, sans-serif`;
-      c.fillText(subTxt.slice(0, 34), pad + 14, pad + h * 0.08);
+      c.font = `900 ${Math.round(h * 0.04)}px "Bebas Neue", Inter, sans-serif`;
+      c.fillText(mainTxt, pad + w * 0.02, pad + h * 0.052);
+      c.fillStyle = '#f1f5f9';
+      c.font = `700 ${Math.round(h * 0.025)}px Inter, sans-serif`;
+      c.fillText(subTxt.slice(0, 34), pad + w * 0.02, pad + h * 0.09);
       c.restore();
     } else if (preset === 'lower-third') {
-      // Bottom Broadcast Lower Third
-      const boxX = w * 0.05;
+      const boxW = w * 0.88;
+      const boxH = h * 0.19;
+      const boxX = w * 0.06 - (w * 0.95) * (1 - enterT);
       const boxY = h * 0.74;
-      const boxW = w * 0.9;
-      const boxH = h * 0.18;
 
       c.save();
-      c.fillStyle = 'rgba(11, 15, 25, 0.92)';
+      // Skewed Broadcast Card
+      c.fillStyle = 'rgba(9, 13, 24, 0.94)';
       c.fillRect(boxX, boxY, boxW, boxH);
 
-      // Neon Left Accent Bar + Bottom Gradient Line
-      const barGrad = c.createLinearGradient(boxX, boxY, boxX + boxW, boxY);
-      barGrad.addColorStop(0, '#ec4899');
-      barGrad.addColorStop(0.5, '#8b5cf6');
-      barGrad.addColorStop(1, '#22d3ee');
-      c.fillStyle = barGrad;
-      c.fillRect(boxX, boxY, 12, boxH);
-      c.fillRect(boxX, boxY + boxH - 5, boxW, 5);
+      // Neon Vice Gradient Top & Left Bar
+      const neonGrad = c.createLinearGradient(boxX, boxY, boxX + boxW, boxY);
+      neonGrad.addColorStop(0, '#ec4899');
+      neonGrad.addColorStop(0.5, '#a855f7');
+      neonGrad.addColorStop(1, '#22d3ee');
+      c.fillStyle = neonGrad;
+      c.fillRect(boxX, boxY, Math.max(8, w * 0.01), boxH);
+      c.fillRect(boxX, boxY + boxH - Math.max(4, h * 0.008), boxW, Math.max(4, h * 0.008));
 
-      // LIVE Badge
-      c.fillStyle = pulse > 0.4 ? '#f43f5e' : '#be123c';
-      c.fillRect(boxX + 28, boxY + 16, 78, 28);
-      c.fillStyle = '#fff';
-      c.font = `900 ${Math.round(h * 0.026)}px Inter, sans-serif`;
-      c.fillText('● LIVE', boxX + 38, boxY + 36);
+      // Pulsing BREAKING / LIVE Pill
+      const pillW = w * 0.11;
+      const pillH = h * 0.048;
+      c.fillStyle = pulse > 0.45 ? '#f43f5e' : '#be123c';
+      c.fillRect(boxX + w * 0.025, boxY + h * 0.026, pillW, pillH);
+      c.fillStyle = '#ffffff';
+      c.font = `800 ${Math.round(h * 0.026)}px "JetBrains Mono", monospace`;
+      c.textAlign = 'center';
+      c.fillText('● LIVE', boxX + w * 0.025 + pillW / 2, boxY + h * 0.059);
 
+      // Headline & Subheadline
+      c.textAlign = 'left';
       c.fillStyle = '#22d3ee';
-      c.font = `900 ${Math.round(h * 0.046)}px Inter, Arial, sans-serif`;
-      c.fillText(mainTxt, boxX + 120, boxY + 40);
+      c.font = `900 ${Math.round(h * 0.056)}px "Bebas Neue", Inter, sans-serif`;
+      c.fillText(mainTxt, boxX + w * 0.15, boxY + h * 0.068);
 
       c.fillStyle = '#f8fafc';
-      c.font = `700 ${Math.round(h * 0.036)}px Inter, Arial, sans-serif`;
-      c.fillText(subTxt, boxX + 28, boxY + boxH - 22);
+      c.font = `700 ${Math.round(h * 0.042)}px Inter, Arial, sans-serif`;
+      c.fillText(subTxt, boxX + w * 0.025, boxY + boxH - h * 0.04);
       c.restore();
     } else if (preset === 'thumb-neon') {
-      // Big 16:9 Neon Thumbnail Title
+      // Authentic Vice Miami Dual-Font Thumbnail Lockup (Anton + Yellowtail Script)
       c.save();
       c.textAlign = 'center';
-      c.shadowColor = '#ec4899';
-      c.shadowBlur = 28;
-      c.fillStyle = '#ffffff';
-      c.font = `900 ${Math.round(h * 0.17)}px Impact, "Arial Black", sans-serif`;
-      c.fillText(mainTxt, w / 2, h * 0.46);
 
-      c.shadowColor = '#06b6d4';
-      c.shadowBlur = 16;
-      c.fillStyle = '#22d3ee';
-      c.font = `900 ${Math.round(h * 0.075)}px Inter, "Arial Black", sans-serif`;
-      c.fillText(subTxt, w / 2, h * 0.62);
+      // Main Condensed Title with Thick Black Outline & Sunset Gradient
+      const mainPx = Math.round(h * 0.21);
+      c.font = `900 ${mainPx}px "Anton", Impact, "Arial Black", sans-serif`;
+      c.lineWidth = Math.max(8, mainPx * 0.11);
+      c.strokeStyle = '#090218';
+      c.shadowColor = 'rgba(0, 0, 0, 0.9)';
+      c.shadowBlur = 20;
+      c.strokeText(mainTxt, w / 2, h * 0.44);
+
+      const titleGrad = c.createLinearGradient(0, h * 0.28, 0, h * 0.48);
+      titleGrad.addColorStop(0, '#ffffff');
+      titleGrad.addColorStop(0.55, '#fde047');
+      titleGrad.addColorStop(1, '#fb923c');
+      c.shadowColor = '#ec4899';
+      c.shadowBlur = 24;
+      c.fillStyle = titleGrad;
+      c.fillText(mainTxt, w / 2, h * 0.44);
+
+      // Cursive Neon Script Subtitle (Yellowtail)
+      const subPx = Math.round(h * 0.095);
+      c.font = `400 ${subPx}px "Yellowtail", cursive, sans-serif`;
+      c.lineWidth = Math.max(5, subPx * 0.12);
+      c.strokeStyle = '#090218';
+      c.shadowColor = '#ec4899';
+      c.shadowBlur = 26;
+      c.strokeText(subTxt, w / 2, h * 0.61);
+      c.fillStyle = '#f472b6';
+      c.fillText(subTxt, w / 2, h * 0.61);
       c.restore();
     }
   }
 
-  [presetEl, mainTextEl, subTextEl, starsEl, cashEl, transparentEl].forEach((el) => {
-    el.addEventListener('input', () => drawViceFrame(ctx, canvas.width, canvas.height, 0));
-    el.addEventListener('change', () => drawViceFrame(ctx, canvas.width, canvas.height, 0));
+  function redrawStatic() {
+    drawViceFrame(ctx, canvas.width, canvas.height, 1.0);
+  }
+
+  [presetEl, mainTextEl, subTextEl, starsEl, cashEl, bgModeEl].forEach((el) => {
+    el.addEventListener('input', redrawStatic);
+    el.addEventListener('change', redrawStatic);
   });
 
   const dropzone = document.getElementById('vp-dropzone');
@@ -1388,38 +1592,38 @@ function initVicePackStudio() {
       const img = new Image();
       img.onload = () => {
         userBgImg = img;
-        transparentEl.checked = false;
-        drawViceFrame(ctx, canvas.width, canvas.height, 0);
+        bgModeEl.value = 'scene';
+        redrawStatic();
       };
       img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
   }
 
-  // Export High-Res 1920x1080 PNG (True Alpha if Transparent is checked)
+  // Export High-Res 1920x1080 PNG
   document.getElementById('btn-vp-download-png').addEventListener('click', () => {
     const hiCanvas = document.createElement('canvas');
     hiCanvas.width = 1920;
     hiCanvas.height = 1080;
     const hctx = hiCanvas.getContext('2d');
-    drawViceFrame(hctx, 1920, 1080, 0.25);
+    drawViceFrame(hctx, 1920, 1080, 1.0);
 
     const link = document.createElement('a');
     link.download = `vice-miami-${presetEl.value}-1080p.png`;
     link.href = hiCanvas.toDataURL('image/png');
     link.click();
-    statusEl.textContent = '✓ Exported 1920×1080 PNG! Drag into Premiere, CapCut, DaVinci, Photoshop or OBS.';
+    statusEl.textContent = '✓ Exported 1920×1080 PNG! Ready for Premiere, CapCut, DaVinci, Photoshop & OBS.';
   });
 
-  // Export 3-Second Animated WebM Loop via MediaRecorder
+  // Export 3-Second Animated WebM Loop (with Zoom, Shake, Slide-In & Chroma Key support)
   document.getElementById('btn-vp-export-webm').addEventListener('click', () => {
     if (typeof canvas.captureStream !== 'function' || typeof MediaRecorder === 'undefined') {
-      statusEl.textContent = '⚠️ Your browser does not support WebM canvas recording. Use PNG export.';
+      statusEl.textContent = '⚠️ WebM recording not supported in this browser. Use PNG or SVG export.';
       return;
     }
     const stream = canvas.captureStream(30);
     const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm';
-    const recorder = new MediaRecorder(stream, { mimeType: mime });
+    const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 6000000 });
     const chunks = [];
 
     recorder.ondataavailable = (e) => {
@@ -1430,31 +1634,74 @@ function initVicePackStudio() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `vice-miami-${presetEl.value}-animated-3s.webm`;
+      a.download = `vice-miami-${presetEl.value}-${bgModeEl.value}-3s.webm`;
       a.click();
-      statusEl.textContent = '✓ Exported 3s Animated WebM! Import directly into CapCut, Premiere Pro or DaVinci Resolve.';
+      statusEl.textContent = bgModeEl.value === 'greenscreen'
+        ? '✓ Exported Green Screen WebM! In CapCut/Premiere apply Chroma Key (#00FF00).'
+        : '✓ Exported 3s Animated WebM! Import into Premiere, CapCut or DaVinci Resolve.';
     };
 
-    statusEl.textContent = '⏳ Recording 3-second animated loop (30fps)...';
+    statusEl.textContent = '⏳ Rendering 3-second 30fps animation (Zoom + Slide-In + Glow)...';
     recorder.start();
     const start = performance.now();
     const duration = 3000;
 
     function tick(now) {
       const elapsed = now - start;
-      const phase = (elapsed % 1000) / 1000;
-      drawViceFrame(ctx, canvas.width, canvas.height, phase);
+      const progress = Math.min(1, elapsed / duration);
+      drawViceFrame(ctx, canvas.width, canvas.height, progress);
       if (elapsed < duration) {
         requestAnimationFrame(tick);
       } else {
         recorder.stop();
-        drawViceFrame(ctx, canvas.width, canvas.height, 0);
+        redrawStatic();
       }
     }
     requestAnimationFrame(tick);
   });
 
-  // Export Universal 3D LUT (.CUBE) — Compatible with Premiere, CapCut, DaVinci, Final Cut, Vegas, Lightroom
+  // Export Editable Vector SVG (Illustrator / Photoshop / Canva / Figma)
+  document.getElementById('btn-vp-download-svg').addEventListener('click', () => {
+    const mainTxt = (mainTextEl.value || 'WASTED').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const subTxt = (subTextEl.value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const cashTxt = (cashEl.value || '$999,999').replace(/&/g, '&amp;');
+    const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="viceSunset" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="55%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="neonBar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ec4899"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+  <g id="Layer_Background_Band">
+    <rect x="0" y="360" width="1920" height="340" fill="#0b0f19" fill-opacity="0.92"/>
+    <rect x="0" y="360" width="1920" height="8" fill="url(#neonBar)"/>
+    <rect x="0" y="692" width="1920" height="8" fill="url(#neonBar)"/>
+  </g>
+  <g id="Layer_HUD_Cash">
+    <text x="1840" y="130" text-anchor="end" font-family="monospace" font-weight="900" font-size="78" fill="#4ade80" stroke="#000" stroke-width="10" paint-order="stroke">${cashTxt}</text>
+  </g>
+  <g id="Layer_Main_Text">
+    <text x="960" y="545" text-anchor="middle" font-family="Impact, Arial Black, sans-serif" font-weight="900" font-size="180" fill="url(#viceSunset)" stroke="#000" stroke-width="18" paint-order="stroke">${mainTxt}</text>
+    <text x="960" y="635" text-anchor="middle" font-family="Arial, sans-serif" font-weight="800" font-size="48" fill="#f8fafc" stroke="#000" stroke-width="8" paint-order="stroke">${subTxt}</text>
+  </g>
+</svg>`;
+    const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `vice-miami-${presetEl.value}-editable.svg`;
+    a.click();
+    statusEl.textContent = '✓ Exported Editable Vector .SVG! Open directly in Illustrator, Photoshop, Figma or Canva.';
+  });
+
+  // Export Universal 3D LUT (.CUBE)
   document.getElementById('btn-vp-download-lut').addEventListener('click', () => {
     const size = 17;
     const lines = [
@@ -1469,11 +1716,10 @@ function initVicePackStudio() {
           const rn = r / (size - 1);
           const gn = g / (size - 1);
           const bn = b / (size - 1);
-          // Warm Neon Sunset + Cyan/Teal Shadow Split Toning
           const lum = 0.2126 * rn + 0.7152 * gn + 0.0722 * bn;
-          const rOut = Math.min(1, Math.max(0, rn * 1.08 + (lum > 0.5 ? 0.06 : -0.03)));
-          const gOut = Math.min(1, Math.max(0, gn * 0.96 + (lum < 0.4 ? 0.03 : 0.0)));
-          const bOut = Math.min(1, Math.max(0, bn * 1.06 + (lum < 0.45 ? 0.07 : 0.02)));
+          const rOut = Math.min(1, Math.max(0, rn * 1.12 + (lum > 0.5 ? 0.07 : -0.04)));
+          const gOut = Math.min(1, Math.max(0, gn * 0.94 + (lum < 0.4 ? 0.04 : 0.0)));
+          const bOut = Math.min(1, Math.max(0, bn * 1.09 + (lum < 0.45 ? 0.09 : 0.02)));
           lines.push(`${rOut.toFixed(6)} ${gOut.toFixed(6)} ${bOut.toFixed(6)}`);
         }
       }
@@ -1487,5 +1733,8 @@ function initVicePackStudio() {
     statusEl.textContent = '✓ Downloaded .CUBE LUT! Works in Premiere, CapCut, DaVinci, Final Cut, Vegas & Lightroom.';
   });
 
-  drawViceFrame(ctx, canvas.width, canvas.height, 0);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(redrawStatic);
+  }
+  redrawStatic();
 }
