@@ -48,26 +48,60 @@ function initTabNavigation() {
     }
   };
 
+  const hashAliasMap = {
+    '#panel-gta6': 'panel-nextgen',
+    '#panel-gta6-pt': 'panel-nextgen',
+    '#gta6': 'panel-nextgen',
+    '#panel-nextgen': 'panel-nextgen',
+    '#panel-roblox': 'panel-roblox',
+    '#panel-youtube': 'panel-youtube',
+    '#panel-thermal': 'panel-thermal',
+    '#panel-cutlist': 'panel-cutlist',
+    '#panel-vicepack': 'panel-vicepack'
+  };
+
+  function activateTabByTargetId(targetId, updateHash = false) {
+    const matchingTab = Array.from(tabs).find((t) => t.getAttribute('data-target') === targetId);
+    const panel = document.getElementById(targetId);
+    if (!matchingTab || !panel) return;
+
+    tabs.forEach((t) => {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected', 'false');
+    });
+    panels.forEach((p) => p.classList.remove('active'));
+
+    matchingTab.classList.add('active');
+    matchingTab.setAttribute('aria-selected', 'true');
+    panel.classList.add('active');
+
+    if (metaMap[targetId]) {
+      heroTitle.textContent = metaMap[targetId].title;
+      heroDesc.textContent = metaMap[targetId].desc;
+    }
+
+    if (updateHash && history.replaceState) {
+      const publicHash = targetId === 'panel-nextgen' ? '#panel-gta6' : `#${targetId}`;
+      history.replaceState(null, '', publicHash);
+    }
+  }
+
   tabs.forEach((tab) => {
     tab.addEventListener('click', () => {
       const targetId = tab.getAttribute('data-target');
-      tabs.forEach((t) => {
-        t.classList.remove('active');
-        t.setAttribute('aria-selected', 'false');
-      });
-      panels.forEach((p) => p.classList.remove('active'));
-
-      tab.classList.add('active');
-      tab.setAttribute('aria-selected', 'true');
-      const panel = document.getElementById(targetId);
-      if (panel) panel.classList.add('active');
-
-      if (metaMap[targetId]) {
-        heroTitle.textContent = metaMap[targetId].title;
-        heroDesc.textContent = metaMap[targetId].desc;
-      }
+      activateTabByTargetId(targetId, true);
     });
   });
+
+  function checkUrlHash() {
+    const rawHash = (window.location.hash || '').toLowerCase().trim();
+    if (rawHash && hashAliasMap[rawHash]) {
+      activateTabByTargetId(hashAliasMap[rawHash], false);
+    }
+  }
+
+  window.addEventListener('hashchange', checkUrlHash);
+  checkUrlHash();
 }
 
 // ----------------------------------------------------------------------------
@@ -830,7 +864,12 @@ function initNextGenChecker() {
   const storageEl = document.getElementById('ng-storage');
   const langBtns = document.querySelectorAll('.lang-btn');
 
-  let lang = 'en';
+  let lang = (window.location.hash.includes('-pt') || (navigator.language && navigator.language.toLowerCase().startsWith('pt')))
+    ? 'pt'
+    : 'en';
+  langBtns.forEach((b) => {
+    b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+  });
 
   const i18n = {
     en: {
@@ -853,6 +892,7 @@ function initNextGenChecker() {
       viceDesc: 'Made for Gaming YouTubers, Streamers & Clippers covering Vice Miami & Leonida news. 1-click .drfx (DaVinci Resolve) + .jsx (After Effects) + OBS Overlays.',
       viceCta: '⚡ Get ViceHeist Pack ($29) →',
       freeSuffix: 'GB Free',
+      bfBadge: '🔥 Black Friday Upgrade Deal',
       amzBtn: 'Amazon Deal →',
       mlBtn: 'Mercado Livre →',
       verdictGreat: 'Next-Gen Ready (Zero Major Bottlenecks)',
@@ -888,6 +928,7 @@ function initNextGenChecker() {
       viceDesc: 'Feito para YouTubers, Streamers e Cortes cobrindo Vice Miami e Leonida. 1 clique no DaVinci (.drfx), After Effects (.jsx) e OBS.',
       viceCta: '⚡ Baixar ViceHeist Pack ($29) →',
       freeSuffix: 'GB Livres',
+      bfBadge: '🔥 Black Friday Upgrade Deal',
       amzBtn: 'Ver na Amazon →',
       mlBtn: 'Mercado Livre →',
       verdictGreat: 'Pronto pra Next-Gen (Sem Gargalos Graves)',
@@ -910,9 +951,21 @@ function initNextGenChecker() {
     const amzDomain = isPt ? 'https://www.amazon.com.br/s' : 'https://www.amazon.com/s';
     const cards = [];
 
-    if (needsSsd || isPs5) {
+    if (isXbox) {
       cards.push({
-        priority: needsSsd,
+        priority: true,
+        bfDeal: true,
+        title: isPt ? 'Cartão de Expansão SSD Xbox Series X|S 1TB/2TB' : 'Xbox Series X|S Storage Expansion Card 1TB/2TB',
+        desc: isPt
+          ? 'Único armazenamento externo que roda jogos Next-Gen nativamente no Xbox.'
+          : 'Official Velocity Architecture expansion required to run Series X|S native titles.',
+        amz: `${amzDomain}?k=Seagate+Storage+Expansion+Card+Xbox+Series&tag=centraldea084-20`,
+        ml: `https://lista.mercadolivre.com.br/cartao-expansao-xbox-series-1tb?matt_tool=mvinicius9355`
+      });
+    } else {
+      cards.push({
+        priority: true,
+        bfDeal: true,
         title: isPt
           ? (isPs5 ? 'SSD NVMe Gen4 2TB c/ Dissipador (PS5 7.300MB/s)' : 'SSD NVMe M.2 Gen4 2TB Alta Velocidade')
           : (isPs5 ? '2TB Gen4 NVMe SSD w/ Heatsink (PS5 7,300MB/s)' : '2TB Gen4 NVMe M.2 SSD (DirectStorage)'),
@@ -924,45 +977,31 @@ function initNextGenChecker() {
       });
     }
 
-    if (isXbox) {
-      cards.push({
-        priority: needsSsd,
-        title: isPt ? 'Cartão de Expansão SSD Xbox Series X|S 1TB/2TB' : 'Xbox Series X|S Storage Expansion Card 1TB/2TB',
-        desc: isPt
-          ? 'Único armazenamento externo que roda jogos Next-Gen nativamente no Xbox.'
-          : 'Official Velocity Architecture expansion required to run Series X|S native titles.',
-        amz: `${amzDomain}?k=Seagate+Storage+Expansion+Card+Xbox+Series&tag=centraldea084-20`,
-        ml: `https://lista.mercadolivre.com.br/cartao-expansao-xbox-series-1tb?matt_tool=mvinicius9355`
-      });
-    }
+    cards.push({
+      priority: needsTv,
+      bfDeal: true,
+      title: isPt ? 'TV 4K 120Hz VRR HDMI 2.1 / Monitor Gamer 144Hz' : '4K 120Hz VRR HDMI 2.1 Gaming TV / 144Hz Monitor',
+      desc: isPt
+        ? 'Desbloqueia modo 40fps VRR e zero ghosting com HDMI 2.1 real.'
+        : 'Unlocks 40fps Balanced VRR, ALLM low-latency & crisp motion clarity.',
+      amz: `${amzDomain}?k=TV+4K+120Hz+HDMI+2.1+VRR+Gaming&tag=centraldea084-20`,
+      ml: `https://lista.mercadolivre.com.br/tv-4k-120hz-hdmi-2-1-vrr?matt_tool=mvinicius9355`
+    });
 
-    if (needsTv) {
-      cards.push({
-        priority: true,
-        title: isPt ? 'TV 4K 120Hz VRR HDMI 2.1 / Monitor Gamer 144Hz' : '4K 120Hz VRR HDMI 2.1 Gaming TV / 144Hz Monitor',
-        desc: isPt
-          ? 'Desbloqueia modo 40fps VRR e zero ghosting com HDMI 2.1 real.'
-          : 'Unlocks 40fps Balanced VRR, ALLM low-latency & crisp motion clarity.',
-        amz: `${amzDomain}?k=TV+4K+120Hz+HDMI+2.1+VRR+Gaming&tag=centraldea084-20`,
-        ml: `https://lista.mercadolivre.com.br/tv-4k-120hz-hdmi-2-1-vrr?matt_tool=mvinicius9355`
-      });
-    }
+    cards.push({
+      priority: needsGpu,
+      bfDeal: true,
+      title: isPt ? 'Placa de Vídeo RTX 4070 / 12GB+ VRAM (DLSS 3/4)' : 'RTX 4070 / 12GB+ VRAM GPU (DLSS Frame Gen)',
+      desc: isPt
+        ? 'Evita quedas de FPS em Ray Tracing com Frame Generation e 12GB+ VRAM.'
+        : 'Prevents Ray Tracing VRAM stutters and enables DLSS Frame Generation.',
+      amz: `${amzDomain}?k=RTX+4070+12GB+Graphics+Card&tag=centraldea084-20`,
+      ml: `https://lista.mercadolivre.com.br/placa-de-video-rtx-4070-12gb?matt_tool=mvinicius9355`
+    });
 
-    if (needsGpu) {
-      cards.push({
-        priority: true,
-        title: isPt ? 'Placa de Vídeo RTX 4070 / 12GB+ VRAM (DLSS 3/4)' : 'RTX 4070 / 12GB+ VRAM GPU (DLSS Frame Gen)',
-        desc: isPt
-          ? 'Evita quedas de FPS em Ray Tracing com Frame Generation e 12GB+ VRAM.'
-          : 'Prevents Ray Tracing VRAM stutters and enables DLSS Frame Generation.',
-        amz: `${amzDomain}?k=RTX+4070+12GB+Graphics+Card&tag=centraldea084-20`,
-        ml: `https://lista.mercadolivre.com.br/placa-de-video-rtx-4070-12gb?matt_tool=mvinicius9355`
-      });
-    }
-
-    // Always include DualSense / Pro Controller or Console Upgrade option
     cards.push({
       priority: false,
+      bfDeal: true,
       title: isPt ? 'Controle DualSense / Headset 3D Pulse & PS5 Pro' : 'DualSense Controller / 3D Gaming Headset & PS5 Pro',
       desc: isPt
         ? 'Feedback háptico adaptativo + áudio espacial 3D para máxima imersão.'
@@ -971,7 +1010,7 @@ function initNextGenChecker() {
       ml: `https://lista.mercadolivre.com.br/controle-dualsense-ps5-pro?matt_tool=mvinicius9355`
     });
 
-    return cards.slice(0, 3);
+    return cards.sort((a, b) => Number(b.priority) - Number(a.priority)).slice(0, 4);
   }
 
   function renderNextGen() {
@@ -1110,6 +1149,7 @@ function initNextGenChecker() {
         (c) => `
       <div class="affiliate-card ${c.priority ? 'priority' : ''}">
         <div>
+          ${c.bfDeal ? `<span class="bf-deal-badge">${t.bfBadge}</span>` : ''}
           <h4>${c.title}</h4>
           <p>${c.desc}</p>
         </div>

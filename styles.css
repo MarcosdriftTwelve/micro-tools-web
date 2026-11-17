@@ -613,8 +613,22 @@ canvas {
 }
 
 .affiliate-card.priority {
-  border-color: rgba(245, 158, 11, 0.6);
-  background: linear-gradient(160deg, rgba(245, 158, 11, 0.08), var(--bg-input));
+  border-color: rgba(245, 158, 11, 0.75);
+  background: linear-gradient(160deg, rgba(245, 158, 11, 0.12), var(--bg-input));
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.12);
+}
+
+.bf-deal-badge {
+  display: inline-block;
+  background: linear-gradient(90deg, #f43f5e, #f59e0b);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-bottom: 6px;
 }
 
 .affiliate-card h4 {
