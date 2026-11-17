@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initThermalLabelCropper();
   initCutListAndQuoteGenerator();
   initNextGenChecker();
+  initVicePackStudio();
 });
 
 // ----------------------------------------------------------------------------
@@ -40,6 +41,10 @@ function initTabNavigation() {
     'panel-nextgen': {
       title: 'GTA 6 / Vice City Next-Gen Hardware, PS5 SSD & 120Hz TV Checker (2026)',
       desc: 'Check your PS5, Xbox Series, or PC readiness score (0–100%), detect SSD/VRAM/HDMI 2.1 bottlenecks, and get matched upgrade picks.'
+    },
+    'panel-vicepack': {
+      title: 'Vice Miami Pack Studio — Premiere, CapCut, DaVinci, AE & Photoshop Generator',
+      desc: 'Generate instant 1080p Alpha PNG overlays, 3s animated WebM loops, and Vice Neon .CUBE LUTs compatible with Premiere, CapCut, DaVinci, AE, Final Cut, Vegas & Photoshop.'
     }
   };
 
@@ -1133,4 +1138,354 @@ function initNextGenChecker() {
   });
 
   renderNextGen();
+}
+
+// ----------------------------------------------------------------------------
+// TOOL 6: VICE MIAMI PACK STUDIO (PREMIERE / CAPCUT / DAVINCI / PHOTOSHOP)
+// ----------------------------------------------------------------------------
+function initVicePackStudio() {
+  const presetEl = document.getElementById('vp-preset');
+  const mainTextEl = document.getElementById('vp-main-text');
+  const subTextEl = document.getElementById('vp-sub-text');
+  const starsEl = document.getElementById('vp-stars');
+  const starsValEl = document.getElementById('vp-stars-val');
+  const cashEl = document.getElementById('vp-cash');
+  const transparentEl = document.getElementById('vp-transparent');
+  const canvas = document.getElementById('vp-canvas');
+  const ctx = canvas.getContext('2d');
+  const statusEl = document.getElementById('vp-export-status');
+
+  let userBgImg = null;
+
+  const presetDefaults = {
+    wasted: { main: 'WASTED', sub: 'PERDEU TUDO NA FUGA DE LEONIDA' },
+    'wanted-hud': { main: 'LEONIDA HEIST', sub: 'ESCAPE THE 6-STAR CHASE' },
+    'lower-third': { main: 'LEONIDA BREAKING NEWS', sub: 'VICE MIAMI POLICE CHASE LIVE ON I-95' },
+    'thumb-neon': { main: 'VICE MIAMI', sub: '6 STARS IN 60 SECONDS' }
+  };
+
+  presetEl.addEventListener('change', () => {
+    const def = presetDefaults[presetEl.value];
+    if (def) {
+      mainTextEl.value = def.main;
+      subTextEl.value = def.sub;
+    }
+    if (presetEl.value === 'thumb-neon') {
+      transparentEl.checked = false;
+    }
+    drawViceFrame(ctx, canvas.width, canvas.height, 0);
+  });
+
+  function drawViceFrame(c, w, h, animPhase) {
+    const preset = presetEl.value;
+    const isAlpha = transparentEl.checked;
+    const mainTxt = (mainTextEl.value || 'WASTED').toUpperCase();
+    const subTxt = (subTextEl.value || '').toUpperCase();
+    const stars = parseInt(starsEl.value, 10) || 6;
+    const cashTxt = cashEl.value || '$999,999';
+
+    starsValEl.textContent = `${stars} ★`;
+    c.clearRect(0, 0, w, h);
+
+    // Background layer (only if not transparent)
+    if (!isAlpha) {
+      if (userBgImg) {
+        c.save();
+        if (preset === 'wasted') {
+          c.filter = 'grayscale(78%) contrast(1.2) brightness(0.72)';
+        }
+        c.drawImage(userBgImg, 0, 0, w, h);
+        c.restore();
+      } else {
+        // Procedural Vice Miami Synthwave Sunset + Neon Grid
+        const sky = c.createLinearGradient(0, 0, 0, h);
+        sky.addColorStop(0, '#0f0524');
+        sky.addColorStop(0.5, '#581c87');
+        sky.addColorStop(0.75, '#ec4899');
+        sky.addColorStop(1, '#090d16');
+        c.fillStyle = sky;
+        c.fillRect(0, 0, w, h);
+
+        // Retro Sunset Sun
+        const sunGrad = c.createLinearGradient(0, h * 0.18, 0, h * 0.58);
+        sunGrad.addColorStop(0, '#fde047');
+        sunGrad.addColorStop(0.6, '#f97316');
+        sunGrad.addColorStop(1, '#ec4899');
+        c.beginPath();
+        c.arc(w / 2, h * 0.42, h * 0.22, 0, Math.PI * 2);
+        c.fillStyle = sunGrad;
+        c.fill();
+
+        // Perspective Neon Grid
+        c.strokeStyle = 'rgba(34, 211, 238, 0.35)';
+        c.lineWidth = 1.5;
+        const horizon = h * 0.62;
+        for (let i = -10; i <= 10; i++) {
+          c.beginPath();
+          c.moveTo(w / 2 + i * (w * 0.04), horizon);
+          c.lineTo(w / 2 + i * (w * 0.16), h);
+          c.stroke();
+        }
+        for (let y = horizon; y < h; y += (y - horizon) * 0.25 + 10) {
+          c.beginPath();
+          c.moveTo(0, y);
+          c.lineTo(w, y);
+          c.stroke();
+        }
+      }
+    }
+
+    // Siren pulse factor for animated WebM (0..1)
+    const pulse = 0.5 + 0.5 * Math.sin(animPhase * Math.PI * 2);
+
+    if (preset === 'wasted') {
+      // Dark cinematic letterbox band
+      const bandH = h * 0.28;
+      const bandY = (h - bandH) / 2;
+      const bandGrad = c.createLinearGradient(0, bandY, 0, bandY + bandH);
+      bandGrad.addColorStop(0, 'rgba(0,0,0,0)');
+      bandGrad.addColorStop(0.2, 'rgba(0,0,0,0.82)');
+      bandGrad.addColorStop(0.8, 'rgba(0,0,0,0.82)');
+      bandGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      c.fillStyle = bandGrad;
+      c.fillRect(0, bandY, w, bandH);
+
+      // Red/Blue subtle corner siren glow
+      if (!isAlpha) {
+        c.fillStyle = `rgba(244, 63, 94, ${0.12 + pulse * 0.12})`;
+        c.fillRect(0, 0, w * 0.5, h);
+        c.fillStyle = `rgba(59, 130, 246, ${0.12 + (1 - pulse) * 0.12})`;
+        c.fillRect(w * 0.5, 0, w * 0.5, h);
+      }
+
+      c.save();
+      c.textAlign = 'center';
+      c.shadowColor = '#f43f5e';
+      c.shadowBlur = 24 + pulse * 14;
+      c.fillStyle = '#fb7185';
+      c.font = `900 ${Math.round(h * 0.15)}px Impact, "Arial Black", sans-serif`;
+      c.fillText(mainTxt, w / 2, h / 2 + h * 0.02);
+
+      c.shadowBlur = 6;
+      c.shadowColor = '#000';
+      c.fillStyle = '#f8fafc';
+      c.font = `700 ${Math.round(h * 0.04)}px Inter, Arial, sans-serif`;
+      c.fillText(subTxt, w / 2, h / 2 + h * 0.09);
+      c.restore();
+    } else if (preset === 'wanted-hud') {
+      // Top-Right Cash + Stars + Time HUD
+      const pad = w * 0.04;
+      c.save();
+      c.textAlign = 'right';
+      c.shadowColor = 'rgba(0,0,0,0.9)';
+      c.shadowBlur = 8;
+
+      // Cash Counter
+      c.fillStyle = '#4ade80';
+      c.font = `900 ${Math.round(h * 0.075)}px "Courier New", monospace`;
+      c.fillText(cashTxt, w - pad, pad + h * 0.06);
+
+      // 6 Stars Row
+      const starSize = Math.round(h * 0.058);
+      c.font = `900 ${starSize}px Arial, sans-serif`;
+      for (let i = 0; i < 6; i++) {
+        const isLit = i < stars;
+        const flashOn = isLit && (pulse > 0.35 || i % 2 === 0);
+        c.fillStyle = flashOn ? '#facc15' : 'rgba(255,255,255,0.22)';
+        c.shadowColor = flashOn ? '#f59e0b' : '#000';
+        c.shadowBlur = flashOn ? 14 : 2;
+        c.fillText('★', w - pad - (5 - i) * (starSize * 1.05), pad + h * 0.135);
+      }
+
+      // Mission Tag Top-Left
+      c.textAlign = 'left';
+      c.fillStyle = 'rgba(15, 23, 42, 0.84)';
+      c.fillRect(pad, pad, w * 0.34, h * 0.1);
+      c.strokeStyle = '#ec4899';
+      c.lineWidth = 3;
+      c.strokeRect(pad, pad, w * 0.34, h * 0.1);
+      c.fillStyle = '#22d3ee';
+      c.font = `800 ${Math.round(h * 0.032)}px Inter, sans-serif`;
+      c.fillText(mainTxt, pad + 14, pad + h * 0.045);
+      c.fillStyle = '#f8fafc';
+      c.font = `600 ${Math.round(h * 0.024)}px Inter, sans-serif`;
+      c.fillText(subTxt.slice(0, 34), pad + 14, pad + h * 0.08);
+      c.restore();
+    } else if (preset === 'lower-third') {
+      // Bottom Broadcast Lower Third
+      const boxX = w * 0.05;
+      const boxY = h * 0.74;
+      const boxW = w * 0.9;
+      const boxH = h * 0.18;
+
+      c.save();
+      c.fillStyle = 'rgba(11, 15, 25, 0.92)';
+      c.fillRect(boxX, boxY, boxW, boxH);
+
+      // Neon Left Accent Bar + Bottom Gradient Line
+      const barGrad = c.createLinearGradient(boxX, boxY, boxX + boxW, boxY);
+      barGrad.addColorStop(0, '#ec4899');
+      barGrad.addColorStop(0.5, '#8b5cf6');
+      barGrad.addColorStop(1, '#22d3ee');
+      c.fillStyle = barGrad;
+      c.fillRect(boxX, boxY, 12, boxH);
+      c.fillRect(boxX, boxY + boxH - 5, boxW, 5);
+
+      // LIVE Badge
+      c.fillStyle = pulse > 0.4 ? '#f43f5e' : '#be123c';
+      c.fillRect(boxX + 28, boxY + 16, 78, 28);
+      c.fillStyle = '#fff';
+      c.font = `900 ${Math.round(h * 0.026)}px Inter, sans-serif`;
+      c.fillText('● LIVE', boxX + 38, boxY + 36);
+
+      c.fillStyle = '#22d3ee';
+      c.font = `900 ${Math.round(h * 0.046)}px Inter, Arial, sans-serif`;
+      c.fillText(mainTxt, boxX + 120, boxY + 40);
+
+      c.fillStyle = '#f8fafc';
+      c.font = `700 ${Math.round(h * 0.036)}px Inter, Arial, sans-serif`;
+      c.fillText(subTxt, boxX + 28, boxY + boxH - 22);
+      c.restore();
+    } else if (preset === 'thumb-neon') {
+      // Big 16:9 Neon Thumbnail Title
+      c.save();
+      c.textAlign = 'center';
+      c.shadowColor = '#ec4899';
+      c.shadowBlur = 28;
+      c.fillStyle = '#ffffff';
+      c.font = `900 ${Math.round(h * 0.17)}px Impact, "Arial Black", sans-serif`;
+      c.fillText(mainTxt, w / 2, h * 0.46);
+
+      c.shadowColor = '#06b6d4';
+      c.shadowBlur = 16;
+      c.fillStyle = '#22d3ee';
+      c.font = `900 ${Math.round(h * 0.075)}px Inter, "Arial Black", sans-serif`;
+      c.fillText(subTxt, w / 2, h * 0.62);
+      c.restore();
+    }
+  }
+
+  [presetEl, mainTextEl, subTextEl, starsEl, cashEl, transparentEl].forEach((el) => {
+    el.addEventListener('input', () => drawViceFrame(ctx, canvas.width, canvas.height, 0));
+    el.addEventListener('change', () => drawViceFrame(ctx, canvas.width, canvas.height, 0));
+  });
+
+  const dropzone = document.getElementById('vp-dropzone');
+  const fileInput = document.getElementById('vp-file-input');
+  dropzone.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('dragover', (e) => e.preventDefault());
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) loadVpImage(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files && fileInput.files[0]) loadVpImage(fileInput.files[0]);
+  });
+
+  function loadVpImage(file) {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        userBgImg = img;
+        transparentEl.checked = false;
+        drawViceFrame(ctx, canvas.width, canvas.height, 0);
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Export High-Res 1920x1080 PNG (True Alpha if Transparent is checked)
+  document.getElementById('btn-vp-download-png').addEventListener('click', () => {
+    const hiCanvas = document.createElement('canvas');
+    hiCanvas.width = 1920;
+    hiCanvas.height = 1080;
+    const hctx = hiCanvas.getContext('2d');
+    drawViceFrame(hctx, 1920, 1080, 0.25);
+
+    const link = document.createElement('a');
+    link.download = `vice-miami-${presetEl.value}-1080p.png`;
+    link.href = hiCanvas.toDataURL('image/png');
+    link.click();
+    statusEl.textContent = '✓ Exported 1920×1080 PNG! Drag into Premiere, CapCut, DaVinci, Photoshop or OBS.';
+  });
+
+  // Export 3-Second Animated WebM Loop via MediaRecorder
+  document.getElementById('btn-vp-export-webm').addEventListener('click', () => {
+    if (typeof canvas.captureStream !== 'function' || typeof MediaRecorder === 'undefined') {
+      statusEl.textContent = '⚠️ Your browser does not support WebM canvas recording. Use PNG export.';
+      return;
+    }
+    const stream = canvas.captureStream(30);
+    const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm';
+    const recorder = new MediaRecorder(stream, { mimeType: mime });
+    const chunks = [];
+
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) chunks.push(e.data);
+    };
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `vice-miami-${presetEl.value}-animated-3s.webm`;
+      a.click();
+      statusEl.textContent = '✓ Exported 3s Animated WebM! Import directly into CapCut, Premiere Pro or DaVinci Resolve.';
+    };
+
+    statusEl.textContent = '⏳ Recording 3-second animated loop (30fps)...';
+    recorder.start();
+    const start = performance.now();
+    const duration = 3000;
+
+    function tick(now) {
+      const elapsed = now - start;
+      const phase = (elapsed % 1000) / 1000;
+      drawViceFrame(ctx, canvas.width, canvas.height, phase);
+      if (elapsed < duration) {
+        requestAnimationFrame(tick);
+      } else {
+        recorder.stop();
+        drawViceFrame(ctx, canvas.width, canvas.height, 0);
+      }
+    }
+    requestAnimationFrame(tick);
+  });
+
+  // Export Universal 3D LUT (.CUBE) — Compatible with Premiere, CapCut, DaVinci, Final Cut, Vegas, Lightroom
+  document.getElementById('btn-vp-download-lut').addEventListener('click', () => {
+    const size = 17;
+    const lines = [
+      'TITLE "Vice_Miami_Neon_Sunset_2026"',
+      `LUT_3D_SIZE ${size}`,
+      'DOMAIN_MIN 0.0 0.0 0.0',
+      'DOMAIN_MAX 1.0 1.0 1.0'
+    ];
+    for (let b = 0; b < size; b++) {
+      for (let g = 0; g < size; g++) {
+        for (let r = 0; r < size; r++) {
+          const rn = r / (size - 1);
+          const gn = g / (size - 1);
+          const bn = b / (size - 1);
+          // Warm Neon Sunset + Cyan/Teal Shadow Split Toning
+          const lum = 0.2126 * rn + 0.7152 * gn + 0.0722 * bn;
+          const rOut = Math.min(1, Math.max(0, rn * 1.08 + (lum > 0.5 ? 0.06 : -0.03)));
+          const gOut = Math.min(1, Math.max(0, gn * 0.96 + (lum < 0.4 ? 0.03 : 0.0)));
+          const bOut = Math.min(1, Math.max(0, bn * 1.06 + (lum < 0.45 ? 0.07 : 0.02)));
+          lines.push(`${rOut.toFixed(6)} ${gOut.toFixed(6)} ${bOut.toFixed(6)}`);
+        }
+      }
+    }
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Vice_Miami_Neon_Sunset_2026.cube';
+    a.click();
+    statusEl.textContent = '✓ Downloaded .CUBE LUT! Works in Premiere, CapCut, DaVinci, Final Cut, Vegas & Lightroom.';
+  });
+
+  drawViceFrame(ctx, canvas.width, canvas.height, 0);
 }

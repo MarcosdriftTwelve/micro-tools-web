@@ -82,6 +82,7 @@
         <button class="nav-tab" data-target="panel-thermal" role="tab" aria-selected="false">📦 4x6" Thermal Label Cropper</button>
         <button class="nav-tab" data-target="panel-cutlist" role="tab" aria-selected="false">🪚 4x8 Cut-List + Client Quote PDF</button>
         <button class="nav-tab" data-target="panel-nextgen" role="tab" aria-selected="false">🌴 GTA 6 / Next-Gen Hardware Checker</button>
+        <button class="nav-tab" data-target="panel-vicepack" role="tab" aria-selected="false">🎬 Vice Pack Studio (Premiere / CapCut)</button>
       </nav>
     </div>
   </header>
@@ -639,6 +640,99 @@
         </div>
         <a href="https://gumroad.com/" target="_blank" rel="noopener" class="btn-promo" id="ng-vice-cta">
           ⚡ Get ViceHeist Pack ($29) →
+        </a>
+      </aside>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TOOL 6: VICE MIAMI PACK STUDIO (PREMIERE / CAPCUT / THUMBNAIL)      -->
+    <!-- =================================================================== -->
+    <section id="panel-vicepack" class="tool-panel" role="tabpanel">
+      <div class="grid-2">
+        <!-- Left Controls -->
+        <div class="card">
+          <div class="card-title">
+            <span>🎬 Vice Miami Pack Studio (Premiere / CapCut / OBS)</span>
+            <span class="brand-badge">Alpha PNG + WebM</span>
+          </div>
+          <p class="card-subtitle">Generate Vice City / Leonida style overlays, Wasted/Busted freezes, 6-Star Wanted HUDs, and Neon Lower Thirds ready to drop into CapCut, Premiere Pro, or DaVinci.</p>
+
+          <div class="form-group">
+            <label for="vp-preset">
+              <span>Overlay / Template Style</span>
+            </label>
+            <select id="vp-preset" class="input-control">
+              <option value="wasted">💀 WASTED / BUSTED Freeze (Red/Blue Siren + Desaturate)</option>
+              <option value="wanted-hud">★★★★★★ 6-Stars Wanted + Cash HUD ($999,999)</option>
+              <option value="lower-third">📺 Leonida Breaking News (Neon Lower Third)</option>
+              <option value="thumb-neon">🌴 Vice Miami Neon Thumbnail (16:9 Synthwave)</option>
+            </select>
+          </div>
+
+          <div class="grid-2" style="gap: 12px;">
+            <div class="form-group">
+              <label for="vp-main-text"><span>Main Headline</span></label>
+              <input type="text" id="vp-main-text" class="input-control" value="WASTED" />
+            </div>
+            <div class="form-group">
+              <label for="vp-sub-text"><span>Subtitle / Cash / Breaking Text</span></label>
+              <input type="text" id="vp-sub-text" class="input-control" value="PERDEU TUDO NA FUGA DE LEONIDA" />
+            </div>
+          </div>
+
+          <div class="grid-2" style="gap: 12px;">
+            <div class="form-group">
+              <label for="vp-stars"><span>Wanted Stars (1–6)</span><span id="vp-stars-val">6 ★</span></label>
+              <input type="range" id="vp-stars" min="1" max="6" value="6" />
+            </div>
+            <div class="form-group">
+              <label for="vp-cash"><span>HUD Cash Counter</span></label>
+              <input type="text" id="vp-cash" class="input-control" value="$999,999" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label style="justify-content: flex-start; gap: 10px; cursor: pointer;">
+              <input type="checkbox" id="vp-transparent" checked style="width: 18px; height: 18px; accent-color: #ec4899;" />
+              <span>Transparent Background (Alpha PNG Overlay for CapCut / Premiere Pro)</span>
+            </label>
+          </div>
+
+          <div class="dropzone" id="vp-dropzone" style="padding: 14px; margin-bottom: 12px;">
+            <input type="file" id="vp-file-input" accept="image/*" style="display:none;" />
+            <strong>🖼️ Optional: Drop Your Gameplay Frame / Photo (16:9)</strong>
+            <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 2px;">Uncheck Transparent Background above to bake the effect onto your image</div>
+          </div>
+
+          <div class="btn-row">
+            <button type="button" class="btn btn-emerald" id="btn-vp-download-png">⬇ Download PNG (1920×1080)</button>
+            <button type="button" class="btn" id="btn-vp-export-webm" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);">🎬 Export Animated Overlay (.WebM 3s)</button>
+            <button type="button" class="btn btn-secondary" id="btn-vp-download-lut">🎨 Download Vice Neon LUT (.CUBE)</button>
+          </div>
+          <div id="vp-export-status" style="font-size: 0.8rem; color: #34d399; margin-top: 8px; min-height: 18px;"></div>
+        </div>
+
+        <!-- Right Live Preview -->
+        <div class="card">
+          <div class="card-title">
+            <span>👁️ Live 1080p Preview (Premiere / CapCut Ready)</span>
+          </div>
+          <p class="card-subtitle">Checkerboard indicates true Alpha transparency — drag the exported `.png` or `.webm` directly above your video track in CapCut/Premiere.</p>
+          <div class="canvas-wrap" id="vp-canvas-bg" style="background-image: linear-gradient(45deg, #161e31 25%, transparent 25%), linear-gradient(-45deg, #161e31 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #161e31 75%), linear-gradient(-45deg, transparent 75%, #161e31 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0;">
+            <canvas id="vp-canvas" width="960" height="540"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upsell Banner for Full ViceHeist Pack -->
+      <aside class="vice-banner" aria-label="Full ViceHeist Pack Upsell">
+        <div class="promo-content">
+          <span class="promo-tag">🎬 Want All 45+ Animated Transitions, SFX &amp; MOGRT/DRFX Presets?</span>
+          <h3>Upgrade to ViceHeist_CreatorPack_V1 ($29) — Full Premiere, CapCut, AE &amp; DaVinci Bundle</h3>
+          <p>Includes 1-click `.jsx` After Effects scripts, `.drfx` DaVinci Resolve macros, 4K ProRes/WebM transparent overlays, Satellite Zoom transitions &amp; Synthwave SFX.</p>
+        </div>
+        <a href="https://gumroad.com/" target="_blank" rel="noopener" class="btn-promo">
+          ⚡ Get Full Pack ($29) →
         </a>
       </aside>
     </section>
